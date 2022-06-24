@@ -55,8 +55,8 @@ namespace Game.Player
             Observable.EveryUpdate()
                 .Subscribe(_ => EveryUpdate())
                 .AddTo(this);
-            Observable.EveryEndOfFrame()
-                .Subscribe(_ => EveryEndOfFrame())
+            Observable.EveryFixedUpdate()
+                .Subscribe(_ => EveryFixedUpdate())
                 .AddTo(this);
         }
 
@@ -65,7 +65,7 @@ namespace Game.Player
             _interact = true;
         }
 
-        private void EveryEndOfFrame()
+        private void EveryFixedUpdate()
         {
             if (Physics.SphereCast(_cameraTransform.position, _settings.Mouse.InteractiveRayRadius, _cameraTransform.forward, out var hit, _settings.Mouse.InteractiveRayDistance, _settings.Mouse.InteractiveSphereLayerMask)
                 &&
@@ -73,7 +73,7 @@ namespace Game.Player
             {
                 if (_interact)
                 {
-                    interactable.Interact();
+                    interactable.Interact(hit);
                 }
             }
             _interact = false;
@@ -90,8 +90,10 @@ namespace Game.Player
                 _yForce += Physics.gravity.y * Time.deltaTime;
             else if (_yForce < 0f)
                 _yForce = 0f;
+
+            var force = _yForce * Time.deltaTime;
             
-            var movedVector = new Vector3(0f, _yForce * Time.deltaTime);
+            var movedVector = new Vector3(0f, force);
             
             if (inputs.Equals(Vector3.zero))
             {
@@ -100,9 +102,11 @@ namespace Game.Player
             }
 
             movedVector += _transform.forward * inputs.y * Time.deltaTime * _settings.Move.Speed;
-
+            
             if (inputs.y > 0)
                 movedVector *= GetSpeedMultiplier();
+
+            movedVector.y = force;
             
             movedVector += _transform.right * inputs.x * Time.deltaTime * _settings.Move.Speed;
 

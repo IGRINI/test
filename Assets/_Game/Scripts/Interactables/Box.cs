@@ -4,9 +4,12 @@ namespace Game.Interactables
 {
     public class Box : MonoBehaviour, IInteractable
     {
-        public void Interact()
+        [SerializeField] private Rigidbody _rigidbody;
+        [SerializeField] private float _force;
+        [SerializeField] private ForceMode _forceMode;
+        public void Interact(RaycastHit hit)
         {
-            Debug.Log("ASFKASLFKASLKFSLAFASLKFSLAAKSFSAKFLSAKFLASFKL");
+            _rigidbody.AddForceAtPosition(hit.normal * -_force, hit.point, _forceMode);
         }
     }
 }
