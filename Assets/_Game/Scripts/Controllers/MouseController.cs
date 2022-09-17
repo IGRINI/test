@@ -11,7 +11,6 @@ namespace Game.Controllers
     public class MouseController : IDisposable
     {
         private readonly InputActionAsset _inputAsset;
-        private readonly PlayerModel _playerModel;
         
         private readonly InputActionMap _mouseMap;
         private readonly InputAction _mousePosition;
@@ -19,10 +18,9 @@ namespace Game.Controllers
         
         private readonly SignalBus _signalBus;
         
-        public MouseController(InputActionAsset inputAsset, PlayerModel playerModel, SignalBus signalBus)
+        public MouseController(InputActionAsset inputAsset, SignalBus signalBus)
         {
             _inputAsset = inputAsset;
-            _playerModel = playerModel;
             _signalBus = signalBus;
             
             _mouseMap = _inputAsset.FindActionMap("Mouse");

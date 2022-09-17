@@ -13,11 +13,13 @@ namespace Game.Installers
             
             DeclareSignal<KeyboardSignals.MovePerformed>();
             DeclareSignal<KeyboardSignals.JumpPerformed>();
-            DeclareSignal<KeyboardSignals.SprintPerformed>();
-            DeclareSignal<KeyboardSignals.SprintCanceled>();
+            DeclareSignal<KeyboardSignals.IsSprintPerformed>();
             DeclareSignal<KeyboardSignals.InteractPerformed>();
             
+            DeclareSignal<GameSignals.PlayerSpawned>();
             DeclareSignal<GameSignals.PlayerSpawnRequest>();
+            DeclareSignal<GameSignals.PlayerMoveActive>();
+            DeclareSignal<GameSignals.PlayerInteractiveActive>();
         }
 
         private DeclareSignalRequireHandlerAsyncTickPriorityCopyBinder DeclareSignal<TSignal>()

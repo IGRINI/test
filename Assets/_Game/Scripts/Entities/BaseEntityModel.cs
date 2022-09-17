@@ -9,21 +9,21 @@ namespace Game.Entities
     {
         private List<Modifier> _modifiers = new();
 
-        protected IEnumerable<Modifier> Modifiers => _modifiers;
+        public IEnumerable<Modifier> Modifiers => _modifiers;
 
-        protected void AddModifier(Modifier modifier)
+        public void AddModifier(Modifier modifier)
         {
             _modifiers.Add(modifier);
         }
 
-        protected void RemoveModifier<T>()
+        public void RemoveModifier<T>()
         {
             _modifiers.Remove(
                 _modifiers.Find(modifier => modifier.GetType() == typeof(T))
             );
         }
 
-        protected float GetSpeedMultiplier()
+        public float GetSpeedMultiplier()
         {
             var speedModifiers =
                 Modifiers.Where(modifier => modifier.Functions.Contains(Modifier.Type.SpeedMultiplier));

@@ -75,5 +75,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a8218ada9434d739e971aee43be8c1a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _player: {fileID: 7985759937105185659, guid: 750226a773931b54babb12b70694261c, type: 3}
+  _player: {fileID: 1181871932384580609, guid: 750226a773931b54babb12b70694261c, type: 3}
   _inputAsset: {fileID: -944628639613478452, guid: 0666fc79afd072c47840d6136d2ee5b5, type: 3}

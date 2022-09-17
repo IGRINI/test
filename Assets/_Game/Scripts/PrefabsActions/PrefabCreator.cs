@@ -23,6 +23,11 @@ namespace Game.PrefabsActions
             return _container.InstantiatePrefab(prefab, parent);
         }
 
+        public T Create<T>(Object prefab)
+        {
+            return _container.InstantiatePrefabForComponent<T>(prefab);
+        }
+
         public T Create<T>(Object prefab, Transform parent)
         {
             return _container.InstantiatePrefabForComponent<T>(prefab, parent);

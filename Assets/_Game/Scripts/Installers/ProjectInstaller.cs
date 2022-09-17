@@ -1,23 +1,29 @@
 ﻿using System.ComponentModel;
 using Game.Controllers;
+using Game.Controllers.Gameplay;
 using UnityEngine;
 using Zenject;
 using Game.Player;
 using Game.PrefabsActions;
+using Game.Views.Player;
 using UnityEngine.InputSystem;
 
 namespace Game.Installers
 {
     public class ProjectInstaller : MonoInstaller
     {
-        [SerializeField] private PlayerModel _player;
+        [SerializeField] private PlayerView _player;
         [SerializeField] private InputActionAsset _inputAsset;
         
         public override void InstallBindings()
         {
             SignalsInstaller.Install(Container);
             
-            Container.Bind<PlayerModel>().FromInstance(_player).AsSingle();
+            Container.Bind<PlayerView>().FromInstance(_player).AsSingle();
+
+            Container.BindInterfacesAndSelfTo<InteractiveController>().AsSingle().NonLazy();
+            Container.BindInterfacesAndSelfTo<PlayerMoveController>().AsSingle().NonLazy();
+            Container.BindInterfacesAndSelfTo<MouseLookController>().AsSingle().NonLazy();
             
             _inputAsset.Enable();
             Container.Bind<InputActionAsset>().FromInstance(_inputAsset).AsSingle().NonLazy();

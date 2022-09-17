@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Game.Views.Player;
+using UnityEngine;
 
 namespace Game.Common
 {
@@ -7,6 +8,18 @@ namespace Game.Common
         public class PlayerSpawnRequest
         {
             public Vector3 Position;
+        }
+        public class PlayerSpawned
+        {
+            public PlayerView Player;
+        }
+        public class PlayerMoveActive
+        {
+            public bool IsActive;
+        }
+        public class PlayerInteractiveActive
+        {
+            public bool IsActive;
         }
     }
 }

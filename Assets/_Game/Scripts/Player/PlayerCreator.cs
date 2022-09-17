@@ -1,5 +1,6 @@
 ﻿using Game.Common;
 using Game.PrefabsActions;
+using Game.Views.Player;
 using UnityEngine;
 using Zenject;
 
@@ -7,20 +8,27 @@ namespace Game.Player
 {
     public class PlayerCreator
     {
-        private readonly PlayerModel _playerModelPrefab;
+        private readonly PlayerView _playerViewPrefab;
         private readonly PrefabCreator _prefabCreator;
+        private readonly SignalBus _signalBus;
         
-        private PlayerCreator(PlayerModel playerModelPrefab, PrefabCreator prefabCreator, SignalBus signalBus)
+        private PlayerCreator(PlayerView playerViewPrefab, PrefabCreator prefabCreator, SignalBus signalBus)
         {
-            _playerModelPrefab = playerModelPrefab;
+            _playerViewPrefab = playerViewPrefab;
             _prefabCreator = prefabCreator;
+            _signalBus = signalBus;
             
-            signalBus.Subscribe<GameSignals.PlayerSpawnRequest>(CreatePlayerForRequest);
+            _signalBus.Subscribe<GameSignals.PlayerSpawnRequest>(CreatePlayerForRequest);
         }
 
         private void CreatePlayerForRequest(GameSignals.PlayerSpawnRequest playerSpawnRequest)
         {
-            _prefabCreator.Create(_playerModelPrefab).transform.position = playerSpawnRequest.Position;
+            var player = _prefabCreator.Create<PlayerView>(_playerViewPrefab);
+            player.transform.position = playerSpawnRequest.Position;
+            
+            _signalBus.Fire(new GameSignals.PlayerSpawned() { Player = player });
+            _signalBus.Fire(new GameSignals.PlayerMoveActive() { IsActive = true });
+            _signalBus.Fire(new GameSignals.PlayerInteractiveActive() { IsActive = true });
         }
     }
 }

@@ -10,9 +10,11 @@ namespace Game.Common
         }
         
         public class JumpPerformed {}
-        
-        public class SprintPerformed {}
-        public class SprintCanceled {}
+
+        public class IsSprintPerformed
+        {
+            public bool IsPerformed;
+        }
         public class InteractPerformed {}
     }
 }

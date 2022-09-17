@@ -10,7 +10,6 @@ namespace Game.Controllers
     public class KeyboardController : IDisposable
     {
         private readonly InputActionAsset _inputAsset;
-        private readonly PlayerModel _playerModel;
         
         private readonly InputActionMap _keyboardMap;
         private readonly InputAction _moveVector;
@@ -20,10 +19,9 @@ namespace Game.Controllers
         
         private readonly SignalBus _signalBus;
         
-        public KeyboardController(InputActionAsset inputAsset, PlayerModel playerModel, SignalBus signalBus)
+        public KeyboardController(InputActionAsset inputAsset, SignalBus signalBus)
         {
             _inputAsset = inputAsset;
-            _playerModel = playerModel;
             _signalBus = signalBus;
             
             _keyboardMap = _inputAsset.FindActionMap("Keyboard");
@@ -51,12 +49,12 @@ namespace Game.Controllers
 
         private void OnSprintPerformed(InputAction.CallbackContext context)
         {
-            _signalBus.Fire<KeyboardSignals.SprintPerformed>();
+            _signalBus.Fire(new KeyboardSignals.IsSprintPerformed() { IsPerformed = true});
         }
         
         private void OnSprintCanceled(InputAction.CallbackContext context)
         {
-            _signalBus.Fire<KeyboardSignals.SprintCanceled>();
+            _signalBus.Fire(new KeyboardSignals.IsSprintPerformed() { IsPerformed = false});
         }
         
         private void OnInteractPerformed(InputAction.CallbackContext context)

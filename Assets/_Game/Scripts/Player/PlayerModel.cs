@@ -48,8 +48,8 @@ namespace Game.Player
             _signalBus.Subscribe<MouseSignals.MouseDeltaPerformed>(obj => MoveCamera(obj.Value));
             _signalBus.Subscribe<KeyboardSignals.MovePerformed>(obj => MoveRigidbody(obj.Value));
             _signalBus.Subscribe<KeyboardSignals.JumpPerformed>(_ => Jump());
-            _signalBus.Subscribe<KeyboardSignals.SprintPerformed>(_ => SetSprint(true));
-            _signalBus.Subscribe<KeyboardSignals.SprintCanceled>(_ => SetSprint(false));
+            // _signalBus.Subscribe<KeyboardSignals.SprintPerformed>(_ => SetSprint(true));
+            // _signalBus.Subscribe<KeyboardSignals.SprintCanceled>(_ => SetSprint(false));
             _signalBus.Subscribe<KeyboardSignals.InteractPerformed>(_ => Interact());
 
             Observable.EveryUpdate()
