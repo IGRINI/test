@@ -13,6 +13,8 @@ namespace Game.Installers
                 .NonLazy();
             
             Container.Bind<PlayerCreator>().AsSingle().NonLazy();
+
+            Container.BindInterfacesAndSelfTo<CannonController>().AsSingle().NonLazy();
         }
     }
 }

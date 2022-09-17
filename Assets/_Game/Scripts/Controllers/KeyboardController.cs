@@ -16,6 +16,7 @@ namespace Game.Controllers
         private readonly InputAction _jump;
         private readonly InputAction _sprint;
         private readonly InputAction _interact;
+        private readonly InputAction _escape;
         
         private readonly SignalBus _signalBus;
         
@@ -27,14 +28,17 @@ namespace Game.Controllers
             _keyboardMap = _inputAsset.FindActionMap("Keyboard");
             _moveVector = _keyboardMap.FindAction("Move");
             _jump = _keyboardMap.FindAction("Jump");
+            _escape = _keyboardMap.FindAction("Escape");
             _sprint = _keyboardMap.FindAction("Sprint");
             _interact = _keyboardMap.FindAction("Interact");
             
             _moveVector.performed += OnMovePerformed;
             _jump.performed += OnJumpPerformed;
+            _escape.performed += OnEscapePerformed;
             _sprint.performed += OnSprintPerformed;
             _sprint.canceled += OnSprintCanceled;
             _interact.canceled += OnInteractPerformed;
+            
         }
 
         private void OnMovePerformed(InputAction.CallbackContext context)
@@ -60,6 +64,11 @@ namespace Game.Controllers
         private void OnInteractPerformed(InputAction.CallbackContext context)
         {
             _signalBus.Fire<KeyboardSignals.InteractPerformed>();
+        }
+
+        private void OnEscapePerformed(InputAction.CallbackContext context)
+        {
+            _signalBus.Fire<KeyboardSignals.EscapePerformed>();
         }
 
         public void Dispose()

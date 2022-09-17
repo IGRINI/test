@@ -16,5 +16,7 @@ namespace Game.Common
             public bool IsPerformed;
         }
         public class InteractPerformed {}
+        
+        public class EscapePerformed {}
     }
 }

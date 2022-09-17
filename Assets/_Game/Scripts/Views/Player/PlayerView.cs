@@ -14,7 +14,7 @@ namespace Game.Views.Player
         public Transform Transform { get; private set; }
 
         public CharacterController CharacterController { get; private set; }
-
+        
         private void Awake()
         {
             CameraTransform = _camera.transform;

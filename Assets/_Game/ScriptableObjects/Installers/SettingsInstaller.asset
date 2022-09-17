@@ -34,3 +34,8 @@ MonoBehaviour:
     Mouse:
       Sensitivity: {x: 0.1, y: 0.1}
       YClamps: {x: -80, y: 90}
+  _cannonSettings:
+    Mouse:
+      Sensitivity: {x: 0.1, y: 0.1}
+      YClamps: {x: -50, y: 75}
+      XClamps: 45

@@ -1,4 +1,5 @@
-﻿using Game.Views.Player;
+﻿using Game.Interactables;
+using Game.Views.Player;
 using UnityEngine;
 
 namespace Game.Common
@@ -20,6 +21,11 @@ namespace Game.Common
         public class PlayerInteractiveActive
         {
             public bool IsActive;
+        }
+        
+        public class CannonInteract
+        {
+            public Cannon Cannon;
         }
     }
 }
