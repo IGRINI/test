@@ -1616,6 +1616,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f373e6fa7354c619a2b27a57dda58f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _chatUi: {fileID: 1908466286}
 --- !u!114 &688686714
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2945,6 +2946,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 2567656667352346334, guid: 8df3f16086b75ad428d2d362f1d8d409, type: 3}
   m_PrefabInstance: {fileID: 2567656669244017843}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1908466286 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2567656667352346333, guid: 8df3f16086b75ad428d2d362f1d8d409, type: 3}
+  m_PrefabInstance: {fileID: 2567656669244017843}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e438d904cc3143f2900e41dc3163aff1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1936211467
 GameObject:
   m_ObjectHideFlags: 0
@@ -3247,6 +3259,18 @@ PrefabInstance:
     - target: {fileID: 2567656667352346335, guid: 8df3f16086b75ad428d2d362f1d8d409, type: 3}
       propertyPath: m_Name
       value: Chat
+      objectReference: {fileID: 0}
+    - target: {fileID: 2567656667453880350, guid: 8df3f16086b75ad428d2d362f1d8d409, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2567656667453880350, guid: 8df3f16086b75ad428d2d362f1d8d409, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2567656667453880350, guid: 8df3f16086b75ad428d2d362f1d8d409, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2567656668757610232, guid: 8df3f16086b75ad428d2d362f1d8d409, type: 3}
       propertyPath: m_AnchorMax.x

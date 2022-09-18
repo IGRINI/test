@@ -74,7 +74,6 @@ public class RakClient
                             //packet_id
                             var internal_packet_id = (InternalPacketID)packet_id;
 
-                            Debug.Log(internal_packet_id);
                             switch (internal_packet_id)
                             {
                                 case InternalPacketID.ID_ALREADY_CONNECTED:

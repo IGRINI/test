@@ -1,5 +1,6 @@
 ﻿using Game.Common;
 using Game.Network;
+using UnityEngine;
 using Zenject;
 
 namespace Game.Installers

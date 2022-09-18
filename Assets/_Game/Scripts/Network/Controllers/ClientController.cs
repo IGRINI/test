@@ -42,6 +42,7 @@ namespace Game.Network
                             Debug.Log(accepted.NickName);
                             break;
                         case NetworkPackets.ClientDataRequest request:
+                            Debug.Log("request");
                             using (var bsOut = PooledBitStream.GetBitStream())
                             {
                                 bsOut.Write((byte)GamePacketID.CLIENT_DATA_REPLY);

@@ -57,10 +57,7 @@ namespace Game.Network
         private void StartUpdate()
         {
             if (_loopThreadActive)
-            {
-                _stopThread = true;
                 return;
-            }
             _loopThread = new Thread(Update);
             _loopThread.Start();
             _loopThreadActive = true;
