@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Game.Common;
 using Game.Views.Player;
 using UnityEngine;
