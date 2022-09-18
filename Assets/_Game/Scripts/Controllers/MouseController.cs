@@ -29,7 +29,7 @@ namespace Game.Controllers
             
             _mouseDelta.performed += OnMouseDeltaPerformed;
             
-            Cursor.lockState = CursorLockMode.Locked;
+            // Cursor.lockState = CursorLockMode.Locked;
         }
 
         private void OnMouseDeltaPerformed(InputAction.CallbackContext context)

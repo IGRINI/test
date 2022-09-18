@@ -1,10 +1,8 @@
-﻿using System.ComponentModel;
-using Game.Controllers;
+﻿using Game.Controllers;
 using Game.Controllers.Gameplay;
+using Game.Controllers.Network;
 using UnityEngine;
 using Zenject;
-using Game.Player;
-using Game.PrefabsActions;
 using Game.Views.Player;
 using UnityEngine.InputSystem;
 
@@ -24,6 +22,8 @@ namespace Game.Installers
             Container.BindInterfacesAndSelfTo<InteractiveController>().AsSingle().NonLazy();
             Container.BindInterfacesAndSelfTo<PlayerMoveController>().AsSingle().NonLazy();
             Container.BindInterfacesAndSelfTo<MouseLookController>().AsSingle().NonLazy();
+            Container.BindInterfacesAndSelfTo<ServerController>().AsSingle().MoveIntoAllSubContainers().NonLazy();
+            Container.BindInterfacesAndSelfTo<ClientController>().AsSingle().MoveIntoAllSubContainers().NonLazy();
             
             _inputAsset.Enable();
             Container.Bind<InputActionAsset>().FromInstance(_inputAsset).AsSingle().NonLazy();

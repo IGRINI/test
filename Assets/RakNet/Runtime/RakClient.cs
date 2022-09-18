@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UniRx;
 using UnityEngine;
 
 public class RakClient
@@ -30,14 +31,14 @@ public class RakClient
     static ushort server_port = 0;
     static string server_password = string.Empty;
 
-    static List<IRakClient> interfaces = new List<IRakClient>();
+    static IRakClient instance;
 
     /// <summary>
     /// Registering interface
     /// </summary>
     public static void RegisterInterface(IRakClient client_interface)
     {
-        interfaces.Add(client_interface);
+        instance = client_interface;
     }
 
     /// <summary>
@@ -45,22 +46,16 @@ public class RakClient
     /// </summary>
     public static void UnRegisterInterface(IRakClient client_interface)
     {
-        interfaces.Remove(client_interface);
+        instance = null;
     }
 
-    internal static void Update()
+    public static void Update()
     {
         if (Initialized)
         {
             if (State == ClientState.IS_CONNECTING)
             {
-                for (var i = 0; i < interfaces.Count; i++)
-                {
-                    if (interfaces[i] != null)
-                    {
-                        interfaces[i].OnConnecting(server_address, server_port, server_password);
-                    }
-                }
+                instance?.OnConnecting(server_address, server_port, server_password);
             }
 
             try
@@ -68,7 +63,7 @@ public class RakClient
                 var packet_ptr = IntPtr.Zero;
                 while ((packet_ptr = Imports.Client_GetPacket(Pointer, out var packet_size, out var local_time)) != IntPtr.Zero)
                 {
-                    using (PooledBitStream bitStream = PooledBitStream.GetBitStream())
+                    using (var bitStream = PooledBitStream.GetBitStream())
                     {
                         bitStream.ReadPacket(packet_ptr);
 
@@ -79,20 +74,15 @@ public class RakClient
                             //packet_id
                             var internal_packet_id = (InternalPacketID)packet_id;
 
+                            Debug.Log(internal_packet_id);
                             switch (internal_packet_id)
                             {
                                 case InternalPacketID.ID_ALREADY_CONNECTED:
                                     break;
 
                                 case InternalPacketID.ID_CONNECTION_REQUEST_ACCEPTED:
-                                    for (int i = 0; i < interfaces.Count; i++)
-                                    {
-                                        State = ClientState.IS_CONNECTED;
-                                        if (interfaces[i] != null)
-                                        {
-                                            interfaces[i].OnConnected(server_address, server_port, server_password);
-                                        }
-                                    }
+                                    State = ClientState.IS_CONNECTED;
+                                    instance?.OnConnected(server_address, server_port, server_password);
                                     break;
 
                                 case InternalPacketID.ID_DISCONNECTION_NOTIFICATION:
@@ -142,13 +132,7 @@ public class RakClient
                         }
                         else
                         {
-                            for (int i = 0; i < interfaces.Count; i++)
-                            {
-                                if (interfaces[i] != null)
-                                {
-                                    interfaces[i].OnReceived(packet_id, packet_size, bitStream, local_time);
-                                }
-                            }
+                            instance?.OnReceived((GamePacketID)packet_id, packet_size, bitStream, local_time);
                         }
                     }
 
@@ -170,7 +154,7 @@ public class RakClient
         }
     }
 
-    internal static void Init()
+    public static void Init()
     {
         if (Initialized) return;
         
@@ -199,7 +183,7 @@ public class RakClient
         }
     }
 
-    internal static void Destroy()
+    public static void Destroy()
     {
         if (Initialized)
         {
@@ -236,7 +220,7 @@ public class RakClient
         server_port = port;
         server_password = password;
         var result = Imports.Client_Connect(Pointer, address, port, password, attemps);
-
+        
         if (result == ClientConnectResult.Connecting) { State = ClientState.IS_CONNECTING; } 
         else if(result is not (ClientConnectResult.AlreadyConnected and ClientConnectResult.AlreadyConnecting)) { State = ClientState.IS_DISCONNECTED; }
 
@@ -273,13 +257,7 @@ public class RakClient
         }
 
         State = ClientState.IS_DISCONNECTED;
-        for (int i = 0; i < interfaces.Count; i++)
-        {
-            if (interfaces[i] != null)
-            {
-                interfaces[i].OnDisconnected(reason, message);
-            }
-        }
+        instance?.OnDisconnected(reason, message);
     }
 
     /// <summary>

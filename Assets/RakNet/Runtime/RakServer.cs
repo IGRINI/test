@@ -38,19 +38,19 @@ public class RakServer
     /// </summary>
     public static OnServerStopCallback OnServerStop;
 
-    static List<IRakServer> interfaces = new List<IRakServer>();
+    static IRakServer instance;
 
     public static void RegisterInterface(IRakServer server_interface)
     {
-        interfaces.Add(server_interface);
+        instance = server_interface;
     }
 
     public static void UnRegisterInterface(IRakServer server_interface)
     {
-        interfaces.Remove(server_interface);
+        instance = null;
     }
 
-    internal static void Update()
+    public static void Update()
     {
         if (!Initialized) return;
         
@@ -70,34 +70,22 @@ public class RakServer
                         switch ((InternalPacketID)packet_id)
                         {
                             case InternalPacketID.ID_NEW_INCOMING_CONNECTION:
-                                for (var i = 0; i < interfaces.Count; i++)
-                                {
-                                    interfaces[i]?.OnConnected(connectionIndex, receiver_guid);
-                                }
+                                instance?.OnConnected(connectionIndex, receiver_guid);
                                 break;
 
                             case InternalPacketID.ID_DISCONNECTION_NOTIFICATION:
                                 var message = bitStream.ReadString();
-                                for (var i = 0; i < interfaces.Count; i++)
-                                {
-                                    interfaces[i]?.OnDisconnected(connectionIndex, receiver_guid, DisconnectReason.ConnectionClosed, message);
-                                }
+                                instance?.OnDisconnected(connectionIndex, receiver_guid, DisconnectReason.ConnectionClosed, message);
                                 break;
 
                             case InternalPacketID.ID_CONNECTION_LOST:
-                                for (var i = 0; i < interfaces.Count; i++)
-                                {
-                                    interfaces[i]?.OnDisconnected(connectionIndex, receiver_guid, DisconnectReason.ConnectionLost, string.Empty);
-                                }
+                                instance?.OnDisconnected(connectionIndex, receiver_guid, DisconnectReason.ConnectionLost, string.Empty);
                                 break;
                         }
                     }
                     else if ((InternalPacketID)packet_id >= InternalPacketID.ID_USER_PACKET_ENUM)
                     {
-                        for (var i = 0; i < interfaces.Count; i++)
-                        {
-                            interfaces[i]?.OnReceived(packet_id, connectionIndex, receiver_guid, bitStream, local_time);
-                        }
+                        instance?.OnReceived((GamePacketID)packet_id, connectionIndex, receiver_guid, bitStream, local_time);
                     }
                 }
 
@@ -115,7 +103,7 @@ public class RakServer
         }
     }
 
-    internal static void Init()
+    public static void Init()
     {
         if (!Initialized)
         {
@@ -145,7 +133,7 @@ public class RakServer
         }
     }
 
-    internal static void Destroy()
+    public static void Destroy()
     {
         if (Initialized)
         {

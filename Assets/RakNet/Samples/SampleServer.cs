@@ -79,7 +79,7 @@ public class SampleServer : MonoBehaviour, IRakServer
         /* Immediately after connecting requesting client data */
         using(PooledBitStream bitStream = PooledBitStream.GetBitStream())
         {
-            bitStream.Write((byte)SamplePacketID.CLIENT_DATA_REQUEST);
+            bitStream.Write((byte)GamePacketID.CLIENT_DATA_REQUEST);
             RakServer.SendToClient(bitStream, guid, PacketPriority.IMMEDIATE_PRIORITY, PacketReliability.RELIABLE, 0);
         }
     }
@@ -98,12 +98,12 @@ public class SampleServer : MonoBehaviour, IRakServer
         }
     }
 
-    void IRakServer.OnReceived(byte packet_id, ushort connectionIndex, ulong guid, BitStream bitStream, ulong local_time)
+    void IRakServer.OnReceived(GamePacketID packet_id, ushort connectionIndex, ulong guid, BitStream bitStream, ulong local_time)
     {
-        switch ((SamplePacketID)packet_id)
+        switch (packet_id)
         {
             /* Processing the client's response */
-            case SamplePacketID.CLIENT_DATA_REPLY:
+            case GamePacketID.CLIENT_DATA_REPLY:
                 string playerName = bitStream.ReadString();
 
                 /* Adding the client data in the dictionary for further manipulations */
@@ -116,7 +116,7 @@ public class SampleServer : MonoBehaviour, IRakServer
                      * Always write the first byte as the packet number before sending data! (range from 134 to 255), 
                      * this is necessary so that the receiving data knows how to process it 
                      */
-                    bsOut.Write((byte)SamplePacketID.CLIENT_DATA_ACCEPTED);
+                    bsOut.Write((byte)GamePacketID.CLIENT_DATA_ACCEPTED);
                     bsOut.Write("edited_"+playerName);//Slightly modifying the player's name :)
 
                     /* Send the client data from the bitstream with low priority, reliable delivery on channel 0 */

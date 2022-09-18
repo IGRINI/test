@@ -22,5 +22,5 @@ public interface IRakClient
     /// On Received Data From Server (byte packet_id, uint packet_size, BitStream bitStream)
     /// </summary>
     /// <param name="local_time">local time when the packet is received (in ms)</param>
-    void OnReceived(byte packet_id, uint packet_size, BitStream bitStream, ulong local_time);
+    void OnReceived(GamePacketID packet_id, uint packet_size, BitStream bitStream, ulong local_time);
 }

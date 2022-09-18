@@ -59,12 +59,12 @@ public class SampleClient : MonoBehaviour, IRakClient
         Debug.Log("[SampleClient] Disconnected "+reason + " -> "+message);
     }
 
-    void IRakClient.OnReceived(byte packet_id, uint packet_size, BitStream bitStream, ulong local_time)
+    void IRakClient.OnReceived(GamePacketID packet_id, uint packet_size, BitStream bitStream, ulong local_time)
     {
-        switch ((SamplePacketID)packet_id)
+        switch (packet_id)
         {
             /* The server requests information about the client, and we will send him the name of the player */
-            case SamplePacketID.CLIENT_DATA_REQUEST:
+            case GamePacketID.CLIENT_DATA_REQUEST:
 
                 /* Recommended design when writing data for sending */
                 using (PooledBitStream bsOut = PooledBitStream.GetBitStream())
@@ -73,7 +73,7 @@ public class SampleClient : MonoBehaviour, IRakClient
                      * Always write the first byte as the packet number before sending data! (range from 134 to 255), 
                      * this is necessary so that the receiving data knows how to process it 
                      */
-                    bsOut.Write((byte)SamplePacketID.CLIENT_DATA_REPLY);
+                    bsOut.Write((byte)GamePacketID.CLIENT_DATA_REPLY);
                     bsOut.Write(playerName);
 
                     /* We send data to the server with priority for immediate sending, reliable transmission over channel 0 */
@@ -82,7 +82,7 @@ public class SampleClient : MonoBehaviour, IRakClient
                 break;
 
             /* The server notify that the data has been processed */
-            case SamplePacketID.CLIENT_DATA_ACCEPTED:
+            case GamePacketID.CLIENT_DATA_ACCEPTED:
                 playerName = bitStream.ReadString();//read the changed name of the player by the server
                 Debug.Log("[SampleClient] Client data accepted by server... My name is "+playerName);
                 break;

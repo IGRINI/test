@@ -1,4 +1,4 @@
-public enum SamplePacketID
+public enum GamePacketID
 {
     CLIENT_DATA_REQUEST = InternalPacketID.ID_USER_PACKET_ENUM,
     CLIENT_DATA_REPLY,
