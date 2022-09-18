@@ -20,7 +20,7 @@ namespace Game.Utils
             {
                 if (GUILayout.Button("Start Server"))
                 {
-                    RakServer.Start("127.0.0.1", 30502);
+                    RakServer.Start("192.168.31.45", 30502);
                 }
             }
             else

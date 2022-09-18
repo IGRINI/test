@@ -34,8 +34,8 @@ namespace Game.Controllers.Network
         {
             while (!_stopThread)
             {
+                Thread.Sleep(100);
                 RakServer.Update();
-                Thread.Sleep(1);
             }
             
             _loopThreadActive = false;

@@ -1,11 +1,22 @@
-﻿using UnityEngine;
+﻿using Game.Controllers.Network;
+using UnityEngine;
+using Zenject;
 
 namespace Game.Utils
 {
     public class ClientGui : MonoBehaviour
     {
+        private ClientController _clientController;
+        
         private string _ip = "109.195.51.158";
         private string _port = "30502";
+        private string _nickName = "Keker";
+
+        [Inject]
+        private void Constructor(ClientController clientController)
+        {
+            _clientController = clientController;
+        }
         
         private void OnGUI()
         {
@@ -23,8 +34,13 @@ namespace Game.Utils
                         GUILayout.Label("Port: ");
                         _port = GUILayout.TextField(_port, GUILayout.Width(70));
                     GUILayout.EndHorizontal();
+                    GUILayout.BeginHorizontal();
+                        GUILayout.Label("NickName: ");
+                        _nickName = GUILayout.TextField(_nickName);
+                    GUILayout.EndHorizontal();
                     if(GUILayout.Button("Connect to server"))
                     {
+                        _clientController.SetNickName(_nickName);
                         RakClient.Connect(_ip, ushort.Parse(_port));
                     }
 

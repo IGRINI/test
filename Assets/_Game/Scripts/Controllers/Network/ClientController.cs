@@ -19,6 +19,8 @@ namespace Game.Controllers.Network
         private bool _loopThreadActive;
         private bool _stopThread;
 
+        private string _myNickName;
+
         public void Initialize()
         {
             Packet.Subscribe(x =>
@@ -32,7 +34,7 @@ namespace Game.Controllers.Network
                             using (var bsOut = PooledBitStream.GetBitStream())
                             {
                                 bsOut.Write((byte)GamePacketID.CLIENT_DATA_REPLY);
-                                bsOut.Write("Wtf");
+                                bsOut.Write(_myNickName);
                                 RakClient.Send(bsOut, PacketPriority.IMMEDIATE_PRIORITY, PacketReliability.RELIABLE, 0);
                             }
                             break;
@@ -56,12 +58,17 @@ namespace Game.Controllers.Network
             RakClient.Destroy();
         }
 
+        public void SetNickName(string nickName)
+        {
+            _myNickName = nickName;
+        }
+
         private void Update()
         {
             while (!_stopThread)
             {
+                Thread.Sleep(10);
                 RakClient.Update();
-                Thread.Sleep(1);
             }
 
             _loopThreadActive = false;
