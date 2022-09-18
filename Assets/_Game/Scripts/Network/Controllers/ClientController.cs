@@ -6,10 +6,12 @@ using UniRx;
 using UnityEngine;
 using Zenject;
 
-namespace Game.Controllers.Network
+namespace Game.Network
 {
     public class ClientController : IInitializable, IDisposable, IRakClient
     {
+        private readonly SignalBus _signalBus;
+        
         private readonly CompositeDisposable _disposable = new();
 
         public readonly ReactiveCommand<ConnectInfo> ConnectedInfo = new();
@@ -19,22 +21,31 @@ namespace Game.Controllers.Network
         private bool _loopThreadActive;
         private bool _stopThread;
 
-        private string _myNickName;
+        public string NickName { get; private set; }
 
+        private ClientController(SignalBus signalBus)
+        {
+            _signalBus = signalBus;
+        }
+        
         public void Initialize()
         {
             Packet.Subscribe(x =>
                 {
+                    _signalBus.Fire(new NetworkSignals.ClientPacketReceived()
+                    {
+                        Packet = x
+                    });
                     switch (x)
                     {
                         case NetworkPackets.ClientDataAccepted accepted:
-                            Debug.Log(accepted.PayLoad);
+                            Debug.Log(accepted.NickName);
                             break;
                         case NetworkPackets.ClientDataRequest request:
                             using (var bsOut = PooledBitStream.GetBitStream())
                             {
                                 bsOut.Write((byte)GamePacketID.CLIENT_DATA_REPLY);
-                                bsOut.Write(_myNickName);
+                                bsOut.Write(NickName);
                                 RakClient.Send(bsOut, PacketPriority.IMMEDIATE_PRIORITY, PacketReliability.RELIABLE, 0);
                             }
                             break;
@@ -51,6 +62,19 @@ namespace Game.Controllers.Network
             StartUpdate();
         }
 
+        public void SendPacket(NetworkPackets.Packet packet)
+        {
+            using var bsOut = PooledBitStream.GetBitStream();
+            switch (packet)
+            {
+                case NetworkPackets.ClientChatMessage clientChatMessage:
+                    bsOut.Write((byte)GamePacketID.CLIENT_CHAT_MESSAGE);
+                    bsOut.Write(clientChatMessage.Text);
+                    RakClient.Send(bsOut, PacketPriority.IMMEDIATE_PRIORITY, PacketReliability.RELIABLE, 0);
+                    break;
+            }
+        }
+
         public void Dispose()
         {
             _stopThread = true;
@@ -60,7 +84,7 @@ namespace Game.Controllers.Network
 
         public void SetNickName(string nickName)
         {
-            _myNickName = nickName;
+            NickName = nickName;
         }
 
         private void Update()
@@ -71,19 +95,28 @@ namespace Game.Controllers.Network
                 RakClient.Update();
             }
 
-            _loopThreadActive = false;
+            _loopThreadActive = _stopThread = false;
         }
 
         private void StartUpdate()
         {
             if (_loopThreadActive)
-            {
-                _stopThread = true;
                 return;
-            }
             _loopThread = new Thread(Update);
             _loopThread.Start();
             _loopThreadActive = true;
+        }
+
+        public void Disconnect()
+        {
+            _stopThread = true;
+            RakClient.Disconnect();
+        }
+
+        public ClientConnectResult Connect(string address, ushort port, string password = "", int attemps = 10)
+        {
+            StartUpdate();
+            return RakClient.Connect(address, port, password, attemps);
         }
 
         public void OnConnecting(string address, ushort port, string password)
@@ -139,7 +172,18 @@ namespace Game.Controllers.Network
                         PacketSize = packet_size,
                         PacketStream = bitStream,
                         LocalTime = local_time,
-                        PayLoad = bitStream.ReadString()
+                        NickName = bitStream.ReadString()
+                    });
+                    break;
+                case GamePacketID.SERVER_CHAT_MESSAGE:
+                    Packet.Execute(new NetworkPackets.ServerChatMessage()
+                    {
+                        GamePacketID = packet_id,
+                        PacketSize = packet_size,
+                        PacketStream = bitStream,
+                        LocalTime = local_time,
+                        NickName = bitStream.ReadString(),
+                        Text = bitStream.ReadString(),
                     });
                     break;
                 default:

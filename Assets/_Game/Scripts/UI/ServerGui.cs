@@ -1,4 +1,4 @@
-﻿using Game.Controllers.Network;
+﻿using Game.Network;
 using UnityEngine;
 using Zenject;
 
@@ -20,14 +20,14 @@ namespace Game.Utils
             {
                 if (GUILayout.Button("Start Server"))
                 {
-                    RakServer.Start("192.168.31.45", 30502);
+                    _serverController.Start();
                 }
             }
             else
             {
                 if (GUILayout.Button("Stop Server"))
                 {
-                    RakServer.Stop();
+                    _serverController.Stop();
                 }
 
                 GUILayout.Box("Connected clients");
@@ -35,7 +35,7 @@ namespace Game.Utils
                 foreach (var data in _serverController.Clients)
                 {
                     GUILayout.BeginHorizontal();
-                    GUILayout.Box(data.PlayerName);
+                    GUILayout.Box(data.NickName);
                     if (GUILayout.Button("Kick"))
                     {
                         RakServer.CloseConnection(data.Guid, true);

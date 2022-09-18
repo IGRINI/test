@@ -1,4 +1,4 @@
-﻿namespace Game.Common
+﻿namespace Game.Network
 {
     public static class NetworkPackets
     {
@@ -14,7 +14,18 @@
 
         public class ClientDataAccepted : Packet
         {
-            public string PayLoad;
+            public string NickName;
+        }
+
+        public class ClientChatMessage : Packet
+        {
+            public string Text;
+        }
+
+        public class ServerChatMessage : Packet
+        {
+            public string NickName;
+            public string Text;
         }
     }
 }

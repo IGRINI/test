@@ -1,4 +1,4 @@
-﻿using Game.Controllers.Network;
+﻿using Game.Network;
 using UnityEngine;
 using Zenject;
 
@@ -41,7 +41,7 @@ namespace Game.Utils
                     if(GUILayout.Button("Connect to server"))
                     {
                         _clientController.SetNickName(_nickName);
-                        RakClient.Connect(_ip, ushort.Parse(_port));
+                        _clientController.Connect(_ip, ushort.Parse(_port));
                     }
 
                     break;
@@ -53,7 +53,7 @@ namespace Game.Utils
                 {
                     if (GUILayout.Button("Disconnect"))
                     {
-                        RakClient.Disconnect();
+                        _clientController.Disconnect();
                     }
 
                     GUILayout.Box("Ping: "+RakClient.Ping);

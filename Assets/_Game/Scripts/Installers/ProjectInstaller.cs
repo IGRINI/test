@@ -1,6 +1,6 @@
 ﻿using Game.Controllers;
 using Game.Controllers.Gameplay;
-using Game.Controllers.Network;
+using Game.Network;
 using UnityEngine;
 using Zenject;
 using Game.Views.Player;

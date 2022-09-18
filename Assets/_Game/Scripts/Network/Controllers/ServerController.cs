@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using UniRx;
 using UnityEngine;
 using Zenject;
 
-namespace Game.Controllers.Network
+namespace Game.Network
 {
     public class ServerController : IInitializable, IDisposable, IRakServer
     {
@@ -38,7 +39,19 @@ namespace Game.Controllers.Network
                 RakServer.Update();
             }
             
-            _loopThreadActive = false;
+            _loopThreadActive = _stopThread = false;
+        }
+
+        public void Start()
+        {
+            StartUpdate();
+            RakServer.Start("192.168.31.45", 30502);
+        }
+
+        public void Stop()
+        {
+            _stopThread = true;
+            RakServer.Stop();
         }
 
         private void StartUpdate()
@@ -64,7 +77,7 @@ namespace Game.Controllers.Network
         {
             if (Clients[connectionIndex] != null && Clients[connectionIndex].Guid == guid)
             {
-                Debug.Log("[Server] Client " + Clients[connectionIndex].PlayerName + " disconnected! (" + reason + ")");
+                Debug.Log("[Server] Client " + Clients[connectionIndex].NickName + " disconnected! (" + reason + ")");
                 Clients.RemoveAt(connectionIndex);
             }
             else
@@ -82,11 +95,21 @@ namespace Game.Controllers.Network
 
                     Clients.Add(new ClientData(guid, playerName));
 
-                    using(PooledBitStream bsOut = PooledBitStream.GetBitStream())
+                    using(var bsOut = PooledBitStream.GetBitStream())
                     {
                         bsOut.Write((byte)GamePacketID.CLIENT_DATA_ACCEPTED);
                         bsOut.Write("edited_"+playerName);
                         RakServer.SendToClient(bsOut, guid, PacketPriority.LOW_PRIORITY, PacketReliability.RELIABLE, 0);
+                    }
+                    break;
+                case GamePacketID.CLIENT_CHAT_MESSAGE:
+                    var text = bitStream.ReadString();
+                    using(var bsOut = PooledBitStream.GetBitStream())
+                    {
+                        bsOut.Write((byte)GamePacketID.SERVER_CHAT_MESSAGE);
+                        bsOut.Write(Clients.First(x => x.Guid == guid).NickName);
+                        bsOut.Write(text);
+                        RakServer.SendToAllIgnore(bsOut, guid, PacketPriority.LOW_PRIORITY, PacketReliability.RELIABLE, 0);
                     }
                     break;
             }
@@ -95,12 +118,12 @@ namespace Game.Controllers.Network
         public class ClientData
         {
             public ulong Guid;
-            public string PlayerName;
+            public string NickName;
 
             public ClientData(ulong guid, string username)
             {
                 Guid = guid;
-                PlayerName = username;
+                NickName = username;
             }
         }
     }
