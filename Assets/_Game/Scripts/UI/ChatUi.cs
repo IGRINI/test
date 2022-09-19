@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Threading;
 using Game.Network;
 using Game.PrefabsActions;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UniRx;
 using Zenject;
 
 namespace Game.Utils
@@ -46,11 +48,17 @@ namespace Game.Utils
         public void AddChatLine(string nick, string text)
         {
             _prefabCreator.Create<TMP_Text>(_chatTextPrefab, _scrollRect.content).text = $"[{nick}]: {text}";
-            _scrollRect.verticalNormalizedPosition = 1f;
+            LayoutRebuilder.ForceRebuildLayoutImmediate(_scrollRect.content);
+            Observable.NextFrame()
+                .Subscribe(x =>
+                {
+                    _scrollRect.verticalNormalizedPosition = 0f;
+                });
         }
 
         public void ReceivePacket(NetworkPackets.Packet packet)
         {
+            Debug.Log(Thread.CurrentThread.ManagedThreadId);
             if (packet is NetworkPackets.ServerChatMessage chatMessage)
             {
                 AddChatLine(chatMessage.NickName, chatMessage.Text);
