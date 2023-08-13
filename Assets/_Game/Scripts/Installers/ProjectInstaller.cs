@@ -22,7 +22,6 @@ namespace Game.Installers
             Container.BindInterfacesAndSelfTo<InteractiveController>().AsSingle().NonLazy();
             Container.BindInterfacesAndSelfTo<PlayerMoveController>().AsSingle().NonLazy();
             Container.BindInterfacesAndSelfTo<MouseLookController>().AsSingle().NonLazy();
-            Container.BindInterfacesAndSelfTo<ServerController>().AsSingle().MoveIntoAllSubContainers().NonLazy();
             Container.BindInterfacesAndSelfTo<ClientController>().AsSingle().MoveIntoAllSubContainers().NonLazy();
             
             _inputAsset.Enable();
