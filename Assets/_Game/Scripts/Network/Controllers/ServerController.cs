@@ -45,7 +45,7 @@ namespace Game.Network
         public void Start()
         {
             StartUpdate();
-            RakServer.Start("192.168.31.45", 30502);
+            RakServer.Start("192.168.31.152", 30502);
         }
 
         public void Stop()
