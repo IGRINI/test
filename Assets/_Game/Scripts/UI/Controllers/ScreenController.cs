@@ -16,8 +16,8 @@ namespace Game.Utils.Controllers
         private readonly List<Screen> _screenList;
         private readonly Canvas _canvas;
 
-        private Screen _current;
-        
+        public Screen Current { get; private set; }
+
         private ScreenController(
             DiContainer container,
             Canvas canvas,
@@ -37,9 +37,9 @@ namespace Game.Utils.Controllers
                 contextDecorator?.Invoke(subContainer);
                 var specificScreen = subContainer.InstantiatePrefabForComponent<T>(screen, _canvas.transform);
                 specificScreen.Show();
-                if(_current != null)
-                    Object.Destroy(_current.gameObject);
-                _current = specificScreen;
+                if(Current != null)
+                    Object.Destroy(Current.gameObject);
+                Current = specificScreen;
             }
             else
             {

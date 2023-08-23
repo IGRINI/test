@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading;
+using Cysharp.Threading.Tasks;
 using Game.Common;
 using ModestTree;
-using UniRx;
 using UnityEngine;
 using Zenject;
 
@@ -12,14 +12,13 @@ namespace Game.Network
     {
         private readonly SignalBus _signalBus;
         
-        private readonly CompositeDisposable _disposable = new();
+        private CancellationTokenSource _loopToken;
 
-        public readonly ReactiveCommand<ConnectInfo> ConnectedInfo = new();
-        public readonly ReactiveCommand<NetworkPackets.Packet> Packet = new();
+        public event Action<ConnectInfo> OnConnectedInfo;
+        public event Action<NetworkPackets.Packet> OnPacketReceived;
         
         private Thread _loopThread;
         private bool _loopThreadActive;
-        private bool _stopThread;
 
         public string NickName { get; private set; }
 
@@ -30,12 +29,8 @@ namespace Game.Network
         
         public void Initialize()
         {
-            Packet.Subscribe(x =>
+            OnPacketReceived += x =>
                 {
-                    _signalBus.Fire(new NetworkSignals.ClientPacketReceived()
-                    {
-                        Packet = x
-                    });
                     switch (x)
                     {
                         case NetworkPackets.ClientDataAccepted accepted:
@@ -51,13 +46,14 @@ namespace Game.Network
                             }
                             break;
                     }
-                });
+                };
 
             // ConnectedInfo.Subscribe(x =>
             // {
             //     Debug.Log($"{x.Address}:{x.Port}, {x.Password}, {x.State}, {x.DisconnectMessage}, {x.DisconnectReason}");
             // });
             
+            _loopToken = new CancellationTokenSource();
             RakClient.RegisterInterface(this);
             RakClient.Init();
             StartUpdate();
@@ -78,8 +74,9 @@ namespace Game.Network
 
         public void Dispose()
         {
-            _stopThread = true;
-            _disposable.Dispose();
+            _loopToken.Cancel();
+            _loopToken.Dispose();
+            _loopThreadActive = false;
             RakClient.Destroy();
         }
 
@@ -88,29 +85,29 @@ namespace Game.Network
             NickName = nickName;
         }
 
-        private void Update()
+        private async void Update()
         {
-            while (!_stopThread)
+            while (!_loopToken.IsCancellationRequested)
             {
-                Thread.Sleep(10);
                 RakClient.Update();
+                await UniTask.Delay(100);
             }
-
-            _loopThreadActive = _stopThread = false;
         }
 
         private void StartUpdate()
         {
             if (_loopThreadActive)
                 return;
-            _loopThread = new Thread(Update);
-            _loopThread.Start();
+            
             _loopThreadActive = true;
+            _ = UniTask.RunOnThreadPool(Update, false, _loopToken.Token);
         }
 
         public void Disconnect()
         {
-            _stopThread = true;
+            _loopToken.Cancel();
+            _loopToken.Dispose();
+            _loopThreadActive = false;
             RakClient.Disconnect();
         }
 
@@ -122,7 +119,7 @@ namespace Game.Network
 
         public void OnConnecting(string address, ushort port, string password)
         {
-            ConnectedInfo.Execute(new ConnectInfo()
+            OnConnectedInfo?.Invoke(new ConnectInfo()
             {
                 Address = address,
                 Port = port,
@@ -133,7 +130,7 @@ namespace Game.Network
 
         public void OnConnected(string address, ushort port, string password)
         {
-            ConnectedInfo.Execute(new ConnectInfo()
+            OnConnectedInfo?.Invoke(new ConnectInfo()
             {
                 Address = address,
                 Port = port,
@@ -144,7 +141,7 @@ namespace Game.Network
 
         public void OnDisconnected(DisconnectReason reason, string message = "")
         {
-            ConnectedInfo.Execute(new ConnectInfo()
+            OnConnectedInfo?.Invoke(new ConnectInfo()
             {
                 State = ClientState.IS_DISCONNECTED,
                 DisconnectMessage = message,
@@ -158,7 +155,7 @@ namespace Game.Network
             switch (packet_id)
             {
                 case GamePacketID.CLIENT_DATA_REQUEST:
-                    Packet.Execute(new NetworkPackets.ClientDataRequest()
+                    OnPacketReceived?.Invoke(new NetworkPackets.ClientDataRequest()
                     {
                         GamePacketID = packet_id,
                         PacketSize = packet_size,
@@ -167,7 +164,7 @@ namespace Game.Network
                     });
                     break;
                 case GamePacketID.CLIENT_DATA_ACCEPTED:
-                    Packet.Execute(new NetworkPackets.ClientDataAccepted()
+                    OnPacketReceived?.Invoke(new NetworkPackets.ClientDataAccepted()
                     {
                         GamePacketID = packet_id,
                         PacketSize = packet_size,
@@ -177,7 +174,7 @@ namespace Game.Network
                     });
                     break;
                 case GamePacketID.SERVER_CHAT_MESSAGE:
-                    Packet.Execute(new NetworkPackets.ServerChatMessage()
+                    OnPacketReceived?.Invoke(new NetworkPackets.ServerChatMessage()
                     {
                         GamePacketID = packet_id,
                         PacketSize = packet_size,

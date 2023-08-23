@@ -10,7 +10,7 @@ using Zenject;
 
 namespace Game.Utils
 {
-    public class ChatUi : MonoBehaviour, IClientPacketReader
+    public class ChatUi : MonoBehaviour
     {
         private PrefabCreator _prefabCreator;
         private ClientController _clientController;
@@ -33,6 +33,12 @@ namespace Game.Utils
         private void Start()
         {
             _chatInput.onSubmit.AddListener(OnSubmit);
+            _clientController.OnPacketReceived += ReceivePacket;
+        }
+
+        private void OnDestroy()
+        {
+            _clientController.OnPacketReceived -= ReceivePacket;
         }
 
         private void OnSubmit(string text)

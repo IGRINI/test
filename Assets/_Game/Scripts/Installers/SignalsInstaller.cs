@@ -24,13 +24,6 @@ namespace Game.Installers
             DeclareSignal<GameSignals.PlayerMoveActive>();
             DeclareSignal<GameSignals.PlayerInteractiveActive>();
             DeclareSignal<GameSignals.CannonInteract>();
-            
-            DeclareSignal<NetworkSignals.ClientPacketReceived>();
-
-            Container.BindSignal<NetworkSignals.ClientPacketReceived>().ToMethod(@object =>
-            {
-                Container.ResolveAll<IClientPacketReader>().ForEach(reader => reader.ReceivePacket(@object.Packet));
-            });
         }
 
         private DeclareSignalRequireHandlerAsyncTickPriorityCopyBinder DeclareSignal<TSignal>()

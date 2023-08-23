@@ -26,11 +26,6 @@ namespace Game.Installers
             Container.Bind<PlayerCreator>().AsSingle().NonLazy();
 
             Container.BindInterfacesAndSelfTo<CannonController>().AsSingle().NonLazy();
-            
-            Container.BindSignal<NetworkSignals.ClientPacketReceived>().ToMethod(@object =>
-            {
-                Container.ResolveAll<IClientPacketReader>().ForEach(reader => reader.ReceivePacket(@object.Packet));
-            });
         }
     }
 }
