@@ -231,6 +231,7 @@ MonoBehaviour:
     SelectedColor: {r: 1, g: 1, b: 1, a: 1}
     DeselectedColor: {r: 1, g: 1, b: 1, a: 0.5019608}
     Duration: 0.2
+  _rectTransform: {fileID: 939502935965503860}
 --- !u!114 &7922696656985287286
 MonoBehaviour:
   m_ObjectHideFlags: 0

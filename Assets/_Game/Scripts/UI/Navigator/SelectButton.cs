@@ -9,7 +9,7 @@ namespace Game.Utils
     public class SelectButton : UIButton
     {
         [SerializeField] private Settings _selectButtonSettings;
-        
+
         protected override void Awake()
         {
             base.Awake();

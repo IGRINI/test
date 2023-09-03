@@ -11,6 +11,7 @@ namespace Game.Utils
         [Inject] private readonly ScreenController _screenController;
         
         [SerializeField] private Transform _selectLight;
+        [SerializeField] private RectTransform _selectBorder;
         [SerializeField] private SelectButton _gameScreenButton;
         [SerializeField] private SelectButton _profileScreenButton;
         [SerializeField] private SelectButton _tavernScreenButton;
@@ -20,7 +21,7 @@ namespace Game.Utils
         [SerializeField] private UIButton _settingsButton;
         [SerializeField] private UIButton _closeButton;
 
-        private void Awake()
+        private void Start()
         {
             _gameScreenButton.OnClick.AddListener(() => _screenController.Show<GameScreen>());
             _profileScreenButton.OnClick.AddListener(() => _screenController.Show<ProfileScreen>());
@@ -50,6 +51,8 @@ namespace Game.Utils
             _marketScreenButton.MakeDeselected();
             
             _selectLight.DOMoveX(button.transform.position.x, .2f);
+            _selectBorder.DOSizeDelta(new Vector2(button.RectTransform.sizeDelta.x, _selectBorder.sizeDelta.y), .2f);
+            // _selectBorder.DOSize
         }
     }
  
