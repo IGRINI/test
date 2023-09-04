@@ -1,4 +1,5 @@
 using DG.Tweening;
+using Game.Utils.Basic;
 using Game.Utils.Controllers;
 using Game.Utils.Screens;
 using UnityEngine;
@@ -10,8 +11,7 @@ namespace Game.Utils
     {
         [Inject] private readonly ScreenController _screenController;
         
-        [SerializeField] private Transform _selectLight;
-        [SerializeField] private RectTransform _selectBorder;
+        [SerializeField] private SelectedLight _selectLight;
         [SerializeField] private SelectButton _gameScreenButton;
         [SerializeField] private SelectButton _profileScreenButton;
         [SerializeField] private SelectButton _tavernScreenButton;
@@ -49,8 +49,7 @@ namespace Game.Utils
             _shelterScreenButton.MakeDeselected();
             _marketScreenButton.MakeDeselected();
             
-            _selectLight.DOMoveX(button.transform.position.x, .2f);
-            _selectBorder.DOSizeDelta(new Vector2(button.RectTransform.sizeDelta.x + 20f, _selectBorder.sizeDelta.y), .2f);
+            _selectLight.SelectElement(button.RectTransform);
             // _selectBorder.DOSize
         }
     }
