@@ -38,8 +38,7 @@ namespace Game.Utils
             // _settingsButton.onClick;
             _closeButton.OnClick.AddListener(Application.Quit);
 
-            SetSelected(_gameScreenButton);
-            _gameScreenButton.MakeSelected();
+            _gameScreenButton.OnClick.Invoke();
         }
 
         private void SetSelected(UIButton button)
@@ -51,7 +50,7 @@ namespace Game.Utils
             _marketScreenButton.MakeDeselected();
             
             _selectLight.DOMoveX(button.transform.position.x, .2f);
-            _selectBorder.DOSizeDelta(new Vector2(button.RectTransform.sizeDelta.x, _selectBorder.sizeDelta.y), .2f);
+            _selectBorder.DOSizeDelta(new Vector2(button.RectTransform.sizeDelta.x + 20f, _selectBorder.sizeDelta.y), .2f);
             // _selectBorder.DOSize
         }
     }
