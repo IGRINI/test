@@ -10,7 +10,7 @@ using Zenject;
 
 namespace Game.Utils
 {
-    public class ChatUi : MonoBehaviour
+    public class OldChatUi : MonoBehaviour
     {
         private PrefabCreator _prefabCreator;
         private ClientController _clientController;

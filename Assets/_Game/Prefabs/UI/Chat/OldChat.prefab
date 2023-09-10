@@ -89,7 +89,7 @@ GameObject:
   - component: {fileID: 2567656667352346334}
   - component: {fileID: 2567656667352346333}
   m_Layer: 5
-  m_Name: Chat
+  m_Name: OldChat
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

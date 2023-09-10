@@ -4,18 +4,19 @@ using Game.Player;
 using Game.PrefabsActions;
 using Game.Utils;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Zenject;
 
 namespace Game.Installers
 {
     public class SceneInstaller : MonoInstaller
     {
-        [SerializeField] private ChatUi _chatUi;
+        [FormerlySerializedAs("_chatUi")] [SerializeField] private OldChatUi oldChatUi;
         
         public override void InstallBindings()
         {
-            Container.BindInterfacesTo<ChatUi>()
-                .FromInstance(_chatUi)
+            Container.BindInterfacesTo<OldChatUi>()
+                .FromInstance(oldChatUi)
                 .AsSingle()
                 .NonLazy();
             
