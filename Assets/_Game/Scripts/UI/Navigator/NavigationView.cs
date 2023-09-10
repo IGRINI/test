@@ -2,6 +2,7 @@ using DG.Tweening;
 using Game.Utils.Basic;
 using Game.Utils.Controllers;
 using Game.Utils.Screens;
+using TMPro;
 using UnityEngine;
 using Zenject;
 

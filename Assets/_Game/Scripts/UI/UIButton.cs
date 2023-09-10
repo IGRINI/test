@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 namespace Game.Utils
 {
+    [DisallowMultipleComponent]
     [RequireComponent(typeof(Button))]
     public class UIButton : MonoBehaviour
     {
