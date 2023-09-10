@@ -2,7 +2,7 @@ using System.Configuration;
 using DG.Tweening;
 using UnityEngine;
 
-namespace Game.Utils.Basic
+namespace Game.Utils.Common
 {
     public class SelectedLight : MonoBehaviour
     {

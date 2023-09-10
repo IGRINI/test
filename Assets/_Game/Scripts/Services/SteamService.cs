@@ -67,5 +67,29 @@ namespace Game.Services
             _initialized = false;
             SteamAPI.Shutdown();
         }
+
+        public Texture2D GetAvatar()
+        {
+            var ret = SteamFriends.GetSmallFriendAvatar(SteamUser.GetSteamID());
+            return GetSteamImageAsTexture2D(ret);
+        }
+        
+        private static Texture2D GetSteamImageAsTexture2D(int iImage) {
+            Texture2D ret = null;
+            uint ImageWidth;
+            uint ImageHeight;
+            var bIsValid = SteamUtils.GetImageSize(iImage, out ImageWidth, out ImageHeight);
+
+            if (!bIsValid) return ret;
+            var Image = new byte[ImageWidth * ImageHeight * 4];
+
+            bIsValid = SteamUtils.GetImageRGBA(iImage, Image, (int)(ImageWidth * ImageHeight * 4));
+            if (!bIsValid) return ret;
+            ret = new Texture2D((int)ImageWidth, (int)ImageHeight, TextureFormat.RGBA32, false, true);
+            ret.LoadRawTextureData(Image);
+            ret.Apply();
+
+            return ret;
+        }
     }
 }
