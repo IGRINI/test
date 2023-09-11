@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Cysharp.Threading.Tasks;
 using Game.Utils;
 using Steamworks;
@@ -29,8 +30,10 @@ namespace Game.Services
         private CSteamID _partySteamId;
         private readonly UniTaskCompletionSource<bool> _partyLoadingAwaiter = new();
         
-        public readonly ReactiveCommand LobbyClosed = new();
-        public readonly ReactiveCollection<CSteamID> LobbyMembers = new();
+        public readonly ReactiveCommand PartyClosed = new();
+        public readonly ReactiveCommand PartyEntered = new();
+        public readonly ReactiveCommand<int> PartyMembersUpdated = new();
+        public readonly List<CSteamID> PartyMembers = new();
 
         public void Initialize()
         {
@@ -92,7 +95,7 @@ namespace Game.Services
         {
             _partyCreated = _partyIsLoading = false;
             _partySteamId = default;
-            LobbyClosed.Execute();
+            PartyClosed.Execute();
             Dev.Log($"{param.m_ulSteamIDAdmin} {param.m_ulSteamIDLobby}");
         }
 
@@ -182,7 +185,17 @@ namespace Game.Services
             _partyCreated = true;
             _partyHostSteamID = new CSteamID(ulong.Parse(SteamMatchmaking.GetLobbyData(_partySteamId, LOBBY_HOST_ID_KEY)));
 
+            PartyMembers.Clear();
+            for (var i = 0; i < SteamMatchmaking.GetNumLobbyMembers(_partySteamId); i++)
+            {
+                var user = SteamMatchmaking.GetLobbyMemberByIndex(_partySteamId, i);
+                if(user != SteamID)
+                    PartyMembers.Add(user);
+            }
+            
             Dev.Log($"OnLobbyEnter {callback.m_rgfChatPermissions} {callback.m_EChatRoomEnterResponse} {callback.m_bLocked} {_partySteamId}");
+            PartyEntered.Execute();
+            PartyMembersUpdated.Execute(PartyMembers.Count);
         }
 
         private void OnLobbyInvite(LobbyInvite_t param)
@@ -199,7 +212,8 @@ namespace Game.Services
             
             SteamMatchmaking.LeaveLobby(_partySteamId);
             _partyCreated = _partyIsLoading = false;
-            LobbyMembers.Clear();
+            PartyMembers.Clear();
+            PartyMembersUpdated.Execute(PartyMembers.Count);
             Dev.Log($"LeaveLobby {_partySteamId}");
         }
 
@@ -213,21 +227,22 @@ namespace Game.Services
                 {
                     SteamMatchmaking.LeaveLobby(_partySteamId);
                     _partyCreated = _partyIsLoading = false;
-                    LobbyClosed.Execute();
+                    PartyClosed.Execute();
                 }
-                LobbyMembers.Add(id);
+                PartyMembers.Add(id);
             }
             else
             {
                 var id = new CSteamID(callback.m_ulSteamIDUserChanged);
-                LobbyMembers.Add(id);
+                PartyMembers.Add(id);
             }
             if((EChatMemberStateChange)callback.m_rgfChatMemberStateChange == EChatMemberStateChange.k_EChatMemberStateChangeLeft)
             {
-                LobbyMembers.Remove(new CSteamID(callback.m_ulSteamIDUserChanged));
+                PartyMembers.Remove(new CSteamID(callback.m_ulSteamIDUserChanged));
             }
+            PartyMembersUpdated.Execute(PartyMembers.Count);
 
-            Dev.Log($"nOnChatJoined {LobbyMembers.Count} OnChatJoined {callback.m_rgfChatMemberStateChange} {callback.m_ulSteamIDLobby} {callback.m_ulSteamIDMakingChange} {callback.m_ulSteamIDUserChanged}");
+            Dev.Log($"OnChatJoined {PartyMembers.Count} {callback.m_rgfChatMemberStateChange} {callback.m_ulSteamIDLobby} {callback.m_ulSteamIDMakingChange} {callback.m_ulSteamIDUserChanged}");
             
         }
 

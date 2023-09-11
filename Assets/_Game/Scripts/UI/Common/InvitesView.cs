@@ -30,32 +30,41 @@ namespace Game.Utils.Common
             _secondFriend.OnClick.AddListener(CreateLobby);
             _lobbyButton.OnClick.AddListener(LobbyButtonCallback);
 
-            _steamService.LobbyClosed.Subscribe(_ =>
+            _steamService.PartyClosed.Subscribe(_ =>
             {
                 _firstFriend.SetButtonInfo();
                 _secondFriend.SetButtonInfo();
                 _lobbyButtonText.text = "Invite";
             });
 
-            _steamService.LobbyMembers.ObserveCountChanged()
-                .Subscribe(x =>
-                {
-                    switch (x)
-                    {
-                        case 0:
-                            _firstFriend.SetButtonInfo();
-                            _secondFriend.SetButtonInfo();
-                            break;
-                        case 1:
-                            _firstFriend.SetButtonInfo(_steamService.GetAvatar(_steamService.LobbyMembers[0]));
-                            _secondFriend.SetButtonInfo();
-                            break;
-                        case 2:
-                            _firstFriend.SetButtonInfo(_steamService.GetAvatar(_steamService.LobbyMembers[0]));
-                            _secondFriend.SetButtonInfo(_steamService.GetAvatar(_steamService.LobbyMembers[1]));
-                            break;
-                    }
-                });
+            _steamService.PartyEntered.Subscribe(_ =>
+            {
+                _lobbyButtonText.text = "Leave";
+            });
+            
+            _lobbyButtonText.text = _steamService.IsInLobby ? "Leave" : "Invite";
+            UpdateIcons(_steamService.PartyMembers.Count);
+            
+            _steamService.PartyMembersUpdated.Subscribe(UpdateIcons);
+        }
+
+        private void UpdateIcons(int playersCount)
+        {
+            switch (playersCount)
+            {
+                case 0:
+                    _firstFriend.SetButtonInfo();
+                    _secondFriend.SetButtonInfo();
+                    break;
+                case 1:
+                    _firstFriend.SetButtonInfo(_steamService.GetAvatar(_steamService.PartyMembers[0]));
+                    _secondFriend.SetButtonInfo();
+                    break;
+                case 2:
+                    _firstFriend.SetButtonInfo(_steamService.GetAvatar(_steamService.PartyMembers[0]));
+                    _secondFriend.SetButtonInfo(_steamService.GetAvatar(_steamService.PartyMembers[1]));
+                    break;
+            }
         }
 
         private async void CreateLobby()
