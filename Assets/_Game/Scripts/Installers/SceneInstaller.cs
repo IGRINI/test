@@ -14,7 +14,6 @@ namespace Game.Installers
     public class SceneInstaller : MonoInstaller
     {
         [FormerlySerializedAs("_chatUi")] [SerializeField] private OldChatUi oldChatUi;
-        [SerializeField] private TextMeshProUGUI _consoleText;
         
         public override void InstallBindings()
         {
@@ -23,7 +22,6 @@ namespace Game.Installers
             //     .AsSingle()
             //     .NonLazy();
             
-            SteamService.ConsoleText = _consoleText;
             
             // Container.Bind<PrefabCreator>()
             //     .AsSingle()

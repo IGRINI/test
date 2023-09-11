@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using Game.Utils;
 using Steamworks;
 using TMPro;
 using UniRx;
@@ -14,8 +15,6 @@ namespace Game.Services
     {
         public static readonly AppId_t STEAM_ID = new(480);
         public const string LOBBY_HOST_ID_KEY = "HostSteamID";
-        
-        public static TextMeshProUGUI ConsoleText;
         
         public static CSteamID SteamID => _mySteamId;
         private static CSteamID _mySteamId;
@@ -94,12 +93,13 @@ namespace Game.Services
             _partyCreated = _partyIsLoading = false;
             _partySteamId = default;
             LobbyClosed.Execute();
+            Dev.Log($"{param.m_ulSteamIDAdmin} {param.m_ulSteamIDLobby}");
         }
 
-        private void AcquireLaunchCommandLine( )
+        private void AcquireLaunchCommandLine()
         {
             if( SteamApps.GetLaunchCommandLine( out var launchCmd, 260 ) > 0 )
-                Debug.Log( $"Got Steam AcquireLaunchCommandLine '{launchCmd}'" );
+                Dev.Log($"AcquireLaunchCommandLine {launchCmd}");
         }
 
         public void Tick()
@@ -182,12 +182,12 @@ namespace Game.Services
             _partyCreated = true;
             _partyHostSteamID = new CSteamID(ulong.Parse(SteamMatchmaking.GetLobbyData(_partySteamId, LOBBY_HOST_ID_KEY)));
 
-            ConsoleText.text = $"{ConsoleText.text}\n{_partySteamId}";
+            Dev.Log($"OnLobbyEnter {callback.m_rgfChatPermissions} {callback.m_EChatRoomEnterResponse} {callback.m_bLocked} {_partySteamId}");
         }
 
         private void OnLobbyInvite(LobbyInvite_t param)
         {
-            
+            Dev.Log($"OnLobbyInvite {param.m_ulSteamIDLobby} {param.m_ulSteamIDUser} {param.m_ulGameID}");
         }
 
         public void LeaveLobby()
@@ -200,7 +200,7 @@ namespace Game.Services
             SteamMatchmaking.LeaveLobby(_partySteamId);
             _partyCreated = _partyIsLoading = false;
             LobbyMembers.Clear();
-            ConsoleText.text = $"{ConsoleText.text}\n{_partySteamId}";
+            Dev.Log($"LeaveLobby {_partySteamId}");
         }
 
         private void OnLobbyChatUpdate(LobbyChatUpdate_t callback)
@@ -226,11 +226,9 @@ namespace Game.Services
             {
                 LobbyMembers.Remove(new CSteamID(callback.m_ulSteamIDUserChanged));
             }
-            ConsoleText.text = $"{ConsoleText.text}\n{LobbyMembers.Count}";
 
-            ConsoleText.text =
-                $"{ConsoleText.text}\nOnChatJoined {callback.m_rgfChatMemberStateChange} {callback.m_ulSteamIDLobby} {callback.m_ulSteamIDMakingChange} {callback.m_ulSteamIDUserChanged}";
-
+            Dev.Log($"nOnChatJoined {LobbyMembers.Count} OnChatJoined {callback.m_rgfChatMemberStateChange} {callback.m_ulSteamIDLobby} {callback.m_ulSteamIDMakingChange} {callback.m_ulSteamIDUserChanged}");
+            
         }
 
         private static Texture2D GetSteamImageAsTexture2D(int iImage) {
