@@ -10,14 +10,6 @@ namespace Game.Installers
         public override void InstallBindings()
         {
             SignalBusInstaller.Install(Container);
-
-            DeclareSignal<MouseSignals.MouseDeltaPerformed>().OptionalSubscriber();
-            
-            DeclareSignal<KeyboardSignals.MovePerformed>();
-            DeclareSignal<KeyboardSignals.JumpPerformed>();
-            DeclareSignal<KeyboardSignals.IsSprintPerformed>();
-            DeclareSignal<KeyboardSignals.InteractPerformed>();
-            DeclareSignal<KeyboardSignals.EscapePerformed>();
             
             DeclareSignal<GameSignals.PlayerSpawned>();
             DeclareSignal<GameSignals.PlayerSpawnRequest>();

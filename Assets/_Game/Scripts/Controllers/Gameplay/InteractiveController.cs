@@ -25,7 +25,7 @@ namespace Game.Controllers.Gameplay
             
             _signalBus.Subscribe<GameSignals.PlayerSpawned>(OnPlayerSpawned);
             _signalBus.Subscribe<GameSignals.PlayerInteractiveActive>(OnPlayerInteractiveActive);
-            _signalBus.Subscribe<KeyboardSignals.InteractPerformed>(Interact);
+            // _signalBus.Subscribe<KeyboardSignals.InteractPerformed>(Interact);
         }
 
         private void OnPlayerSpawned(GameSignals.PlayerSpawned eventObject)

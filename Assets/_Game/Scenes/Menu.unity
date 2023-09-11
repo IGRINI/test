@@ -1714,6 +1714,10 @@ PrefabInstance:
       propertyPath: m_fontColor32.rgba
       value: 2164260863
       objectReference: {fileID: 0}
+    - target: {fileID: 4257103124024149388, guid: 4f99f87ee31ac984f89c9588341d7e5d, type: 3}
+      propertyPath: 'm_ActiveFontFeatures.Array.data[0]'
+      value: 1801810542
+      objectReference: {fileID: 0}
     - target: {fileID: 6018135856806013082, guid: 4f99f87ee31ac984f89c9588341d7e5d, type: 3}
       propertyPath: m_Name
       value: MarketButton
@@ -1846,6 +1850,10 @@ PrefabInstance:
     - target: {fileID: 4257103124024149388, guid: 4f99f87ee31ac984f89c9588341d7e5d, type: 3}
       propertyPath: m_fontColor32.rgba
       value: 2164260863
+      objectReference: {fileID: 0}
+    - target: {fileID: 4257103124024149388, guid: 4f99f87ee31ac984f89c9588341d7e5d, type: 3}
+      propertyPath: 'm_ActiveFontFeatures.Array.data[0]'
+      value: 1801810542
       objectReference: {fileID: 0}
     - target: {fileID: 6018135856806013082, guid: 4f99f87ee31ac984f89c9588341d7e5d, type: 3}
       propertyPath: m_Name
@@ -2222,6 +2230,10 @@ PrefabInstance:
     - target: {fileID: 4257103124024149388, guid: 4f99f87ee31ac984f89c9588341d7e5d, type: 3}
       propertyPath: m_fontColor32.rgba
       value: 2164260863
+      objectReference: {fileID: 0}
+    - target: {fileID: 4257103124024149388, guid: 4f99f87ee31ac984f89c9588341d7e5d, type: 3}
+      propertyPath: 'm_ActiveFontFeatures.Array.data[0]'
+      value: 1801810542
       objectReference: {fileID: 0}
     - target: {fileID: 6018135856806013082, guid: 4f99f87ee31ac984f89c9588341d7e5d, type: 3}
       propertyPath: m_Name

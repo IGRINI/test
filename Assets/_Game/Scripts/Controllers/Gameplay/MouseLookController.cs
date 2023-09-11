@@ -25,7 +25,7 @@ namespace Game.Controllers.Gameplay
             
             _signalBus.Subscribe<GameSignals.PlayerSpawned>(OnPlayerSpawned);
             _signalBus.Subscribe<GameSignals.PlayerMoveActive>(OnPlayerMoveActive);
-            _signalBus.Subscribe<MouseSignals.MouseDeltaPerformed>(obj => MoveCamera(obj.Value));
+            // _signalBus.Subscribe<MouseSignals.MouseDeltaPerformed>(obj => MoveCamera(obj.Value));
         }
 
         private void OnPlayerSpawned(GameSignals.PlayerSpawned eventObject)

@@ -5,6 +5,7 @@ using Game.Services;
 using UnityEngine;
 using Zenject;
 using Game.Views.Player;
+using TMPro;
 using UnityEngine.InputSystem;
 
 namespace Game.Installers
@@ -12,6 +13,7 @@ namespace Game.Installers
     public class ProjectInstaller : MonoInstaller
     {
         [SerializeField] private InputActionAsset _inputAsset;
+        [SerializeField] private TextMeshProUGUI _consoleText;
         
         public override void InstallBindings()
         {

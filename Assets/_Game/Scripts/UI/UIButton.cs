@@ -14,6 +14,7 @@ namespace Game.Utils
         private Button _button;
         [SerializeField] private RectTransform _rectTransform;
         
+        public Button Button => _button;
         public UnityEvent OnClick => _button.onClick;
         
         protected virtual void Awake()

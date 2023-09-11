@@ -45,9 +45,9 @@ public class CannonController
         IsOnCannon = true;
         _currentCannon = eventObject.Cannon;
         
-        _signalBus.Subscribe<KeyboardSignals.EscapePerformed>(CannonExit);
-        _signalBus.Subscribe<MouseSignals.MouseDeltaPerformed>(CannonRotate);
-        _signalBus.Subscribe<MouseSignals.MouseDeltaPerformed>(MoveCamera);
+        // _signalBus.Subscribe<KeyboardSignals.EscapePerformed>(CannonExit);
+        // _signalBus.Subscribe<MouseSignals.MouseDeltaPerformed>(CannonRotate);
+        // _signalBus.Subscribe<MouseSignals.MouseDeltaPerformed>(MoveCamera);
         
     }
 
@@ -59,52 +59,52 @@ public class CannonController
         _signalBus.Fire(new GameSignals.PlayerInteractiveActive() { IsActive = true });
         IsOnCannon = false;
         _currentCannon = null;
-        _signalBus.Unsubscribe<KeyboardSignals.EscapePerformed>(CannonExit);
-        _signalBus.Unsubscribe<MouseSignals.MouseDeltaPerformed>(CannonRotate);
-        _signalBus.Unsubscribe<MouseSignals.MouseDeltaPerformed>(MoveCamera);
+        // _signalBus.Unsubscribe<KeyboardSignals.EscapePerformed>(CannonExit);
+        // _signalBus.Unsubscribe<MouseSignals.MouseDeltaPerformed>(CannonRotate);
+        // _signalBus.Unsubscribe<MouseSignals.MouseDeltaPerformed>(MoveCamera);
     }
 
 
-    private void MoveCamera(MouseSignals.MouseDeltaPerformed mouseDeltaPerformed)
-    {
-        if (!_currentCannon || !IsOnCannon) return;
-
-        mouseDelta = mouseDeltaPerformed.Value;
-
-        if (!(_cannonRotationY <= _settings.Mouse.YClamps.x || _cannonRotationY >= _settings.Mouse.YClamps.y))
-        {
-            _cameraRotationY = Mathf.Clamp(_cameraRotationY +
-                                           mouseDelta.y * _settings.Mouse.CameraSensitivity.y, _settings.Mouse.YClamps.x,
-            _settings.Mouse.YClamps.y);
-
-            _player.CameraTransform.localEulerAngles = new Vector3(-_cameraRotationY, 0);
-        }
-
-        if (_cannonRotationX.y <= -QuaternionXClamp || _cannonRotationX.y >= QuaternionXClamp) return;
-        
-        _cameraRotationX = _player.Transform.localRotation.eulerAngles.y +
-                           mouseDelta.x * _settings.Mouse.CameraSensitivity.x;
-        _player.Transform.localEulerAngles = new Vector3(0, _cameraRotationX);
-    }
+    // private void MoveCamera(MouseSignals.MouseDeltaPerformed mouseDeltaPerformed)
+    // {
+    //     if (!_currentCannon || !IsOnCannon) return;
+    //
+    //     mouseDelta = mouseDeltaPerformed.Value;
+    //
+    //     if (!(_cannonRotationY <= _settings.Mouse.YClamps.x || _cannonRotationY >= _settings.Mouse.YClamps.y))
+    //     {
+    //         _cameraRotationY = Mathf.Clamp(_cameraRotationY +
+    //                                        mouseDelta.y * _settings.Mouse.CameraSensitivity.y, _settings.Mouse.YClamps.x,
+    //         _settings.Mouse.YClamps.y);
+    //
+    //         _player.CameraTransform.localEulerAngles = new Vector3(-_cameraRotationY, 0);
+    //     }
+    //
+    //     if (_cannonRotationX.y <= -QuaternionXClamp || _cannonRotationX.y >= QuaternionXClamp) return;
+    //     
+    //     _cameraRotationX = _player.Transform.localRotation.eulerAngles.y +
+    //                        mouseDelta.x * _settings.Mouse.CameraSensitivity.x;
+    //     _player.Transform.localEulerAngles = new Vector3(0, _cameraRotationX);
+    // }
     
     
     
-    private void CannonRotate(MouseSignals.MouseDeltaPerformed mouseDeltaPerformed)
-    {
-        if (!_currentCannon || !IsOnCannon) return;
-
-        mouseDelta = mouseDeltaPerformed.Value;
-        
-        _cannonRotationX = Quaternion.Euler(0, _currentCannon.CannonTransform.localRotation.eulerAngles.y + mouseDelta.x * _settings.Mouse.CannonSensitivity.x, 0);
-        _cannonRotationX.y = Mathf.Clamp(_cannonRotationX.y, -QuaternionXClamp, QuaternionXClamp);
-        _currentCannon.CannonTransform.localRotation = _cannonRotationX;
-            
-        _cannonRotationY = Mathf.Clamp(_cannonRotationY +
-                                       mouseDelta.y * _settings.Mouse.CannonSensitivity.y, _settings.Mouse.YClamps.x,
-            _settings.Mouse.YClamps.y);
-            
-        _currentCannon.BarrelTransform.localEulerAngles = new Vector3(-_cannonRotationY, 0);
-    }
+    // private void CannonRotate(MouseSignals.MouseDeltaPerformed mouseDeltaPerformed)
+    // {
+    //     if (!_currentCannon || !IsOnCannon) return;
+    //
+    //     mouseDelta = mouseDeltaPerformed.Value;
+    //     
+    //     _cannonRotationX = Quaternion.Euler(0, _currentCannon.CannonTransform.localRotation.eulerAngles.y + mouseDelta.x * _settings.Mouse.CannonSensitivity.x, 0);
+    //     _cannonRotationX.y = Mathf.Clamp(_cannonRotationX.y, -QuaternionXClamp, QuaternionXClamp);
+    //     _currentCannon.CannonTransform.localRotation = _cannonRotationX;
+    //         
+    //     _cannonRotationY = Mathf.Clamp(_cannonRotationY +
+    //                                    mouseDelta.y * _settings.Mouse.CannonSensitivity.y, _settings.Mouse.YClamps.x,
+    //         _settings.Mouse.YClamps.y);
+    //         
+    //     _currentCannon.BarrelTransform.localEulerAngles = new Vector3(-_cannonRotationY, 0);
+    // }
 
     
     

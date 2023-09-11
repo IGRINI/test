@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3397164407979777300}
   - component: {fileID: 137807754171892539}
   - component: {fileID: 8254485712853485253}
-  - component: {fileID: 7362756820170588604}
+  - component: {fileID: 1641025493705614858}
   m_Layer: 5
   m_Name: InviteButton
   m_TagString: Untagged
@@ -122,7 +122,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &7362756820170588604
+--- !u!114 &1641025493705614858
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -131,10 +131,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 6247661061886818319}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 99d4c539ab4340b781ca1a35827e0e87, type: 3}
+  m_Script: {fileID: 11500000, guid: c74674c9c14c45309a6221fe95fa8d89, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _rectTransform: {fileID: 8981533415865091901}
+  _avatarImage: {fileID: 137807754171892539}
+  _plusIcon: {fileID: 7249548593659172050}
 --- !u!1 &9183090261205454601
 GameObject:
   m_ObjectHideFlags: 0
@@ -194,9 +196,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
+  m_Maskable: 0
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []

@@ -1,12 +1,21 @@
 ﻿using System;
 using Game.Common;
 using Game.Player;
+using UniRx;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Zenject;
 
 namespace Game.Controllers
 {
+    public enum KeyAction
+    {
+        Jump,
+        Escape,
+        Console,
+        Sprint,
+        Interact
+    }
     public class KeyboardController : IDisposable
     {
         private readonly InputActionAsset _inputAsset;
@@ -17,24 +26,28 @@ namespace Game.Controllers
         private readonly InputAction _sprint;
         private readonly InputAction _interact;
         private readonly InputAction _escape;
-        
-        private readonly SignalBus _signalBus;
-        
+        private readonly InputAction _console;
+
+        public event Action<KeyAction> KeyPerformed;
+        public event Action<KeyAction> KeyCanceled;
+        public event Action<Vector2> Move;
+
         public KeyboardController(InputActionAsset inputAsset, SignalBus signalBus)
         {
             _inputAsset = inputAsset;
-            _signalBus = signalBus;
             
             _keyboardMap = _inputAsset.FindActionMap("Keyboard");
             _moveVector = _keyboardMap.FindAction("Move");
             _jump = _keyboardMap.FindAction("Jump");
             _escape = _keyboardMap.FindAction("Escape");
+            _console = _keyboardMap.FindAction("Console");
             _sprint = _keyboardMap.FindAction("Sprint");
             _interact = _keyboardMap.FindAction("Interact");
             
             _moveVector.performed += OnMovePerformed;
             _jump.performed += OnJumpPerformed;
             _escape.performed += OnEscapePerformed;
+            _console.performed += OnConsolePerformed;
             _sprint.performed += OnSprintPerformed;
             _sprint.canceled += OnSprintCanceled;
             _interact.canceled += OnInteractPerformed;
@@ -43,38 +56,44 @@ namespace Game.Controllers
 
         private void OnMovePerformed(InputAction.CallbackContext context)
         {
-            _signalBus.Fire(new KeyboardSignals.MovePerformed() { Value = context.ReadValue<Vector2>() });
+            Move?.Invoke(context.ReadValue<Vector2>());
+        }
+
+        private void OnConsolePerformed(InputAction.CallbackContext context)
+        {
+            KeyPerformed?.Invoke(KeyAction.Console);
         }
 
         private void OnJumpPerformed(InputAction.CallbackContext context)
         {
-            _signalBus.Fire<KeyboardSignals.JumpPerformed>();
+            KeyPerformed?.Invoke(KeyAction.Jump);
         }
 
         private void OnSprintPerformed(InputAction.CallbackContext context)
         {
-            _signalBus.Fire(new KeyboardSignals.IsSprintPerformed() { IsPerformed = true});
+            KeyPerformed?.Invoke(KeyAction.Sprint);
         }
-        
         private void OnSprintCanceled(InputAction.CallbackContext context)
         {
-            _signalBus.Fire(new KeyboardSignals.IsSprintPerformed() { IsPerformed = false});
+            KeyCanceled?.Invoke(KeyAction.Sprint);
         }
         
         private void OnInteractPerformed(InputAction.CallbackContext context)
         {
-            _signalBus.Fire<KeyboardSignals.InteractPerformed>();
+            KeyPerformed?.Invoke(KeyAction.Interact);
         }
 
         private void OnEscapePerformed(InputAction.CallbackContext context)
         {
-            _signalBus.Fire<KeyboardSignals.EscapePerformed>();
+            KeyPerformed?.Invoke(KeyAction.Escape);
         }
 
         public void Dispose()
         {
             _moveVector.performed -= OnMovePerformed;
             _jump.performed -= OnJumpPerformed;
+            _escape.performed -= OnEscapePerformed;
+            _console.performed -= OnConsolePerformed;
             _sprint.performed -= OnSprintPerformed;
             _sprint.canceled -= OnSprintCanceled;
             _interact.canceled -= OnInteractPerformed;

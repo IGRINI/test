@@ -26,9 +26,9 @@ namespace Game.Controllers.Gameplay
             _signalBus.Subscribe<GameSignals.PlayerSpawned>(OnPlayerSpawned);
             _signalBus.Subscribe<GameSignals.PlayerMoveActive>(OnPlayerMoveActive);
             
-            _signalBus.Subscribe<KeyboardSignals.MovePerformed>(eventObject => SetMoveInputs(eventObject.Value));
-            _signalBus.Subscribe<KeyboardSignals.JumpPerformed>(Jump);
-            _signalBus.Subscribe<KeyboardSignals.IsSprintPerformed>(eventObject => SetSprint(eventObject.IsPerformed));
+            // _signalBus.Subscribe<KeyboardSignals.MovePerformed>(eventObject => SetMoveInputs(eventObject.Value));
+            // _signalBus.Subscribe<KeyboardSignals.JumpPerformed>(Jump);
+            // _signalBus.Subscribe<KeyboardSignals.IsSprintPerformed>(eventObject => SetSprint(eventObject.IsPerformed));
         }
 
         private void OnPlayerSpawned(GameSignals.PlayerSpawned eventObject)

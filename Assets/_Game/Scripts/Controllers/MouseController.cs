@@ -1,6 +1,5 @@
 ﻿using System;
 using Game.Common;
-using Game.Input;
 using Game.Player;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -34,7 +33,7 @@ namespace Game.Controllers
 
         private void OnMouseDeltaPerformed(InputAction.CallbackContext context)
         {
-            _signalBus.Fire(new MouseSignals.MouseDeltaPerformed() { Value = context.ReadValue<Vector2>() });
+            // _signalBus.Fire(new MouseSignals.MouseDeltaPerformed() { Value = context.ReadValue<Vector2>() });
         }
 
         public void Dispose()
