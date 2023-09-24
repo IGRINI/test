@@ -28,7 +28,7 @@ namespace Game.Utils.Screens
         public void SetTabView(int index)
         {
             _topTabsView.SetActiveTabWithoutNotify(_tabs[index]);
-            
+            _stashViewObject.SetActive(index == 1);
         }
     }
 }
