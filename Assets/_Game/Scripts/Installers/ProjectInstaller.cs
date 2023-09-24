@@ -1,6 +1,7 @@
 ﻿using Game.Controllers;
 using Game.Controllers.Gameplay;
 using Game.Network;
+using Game.PrefabsActions;
 using Game.Services;
 using UnityEngine;
 using Zenject;
@@ -20,6 +21,7 @@ namespace Game.Installers
             SignalsInstaller.Install(Container);
             
             Container.BindInterfacesAndSelfTo<ClientController>().AsSingle().MoveIntoAllSubContainers().NonLazy();
+            Container.BindInterfacesAndSelfTo<PrefabCreator>().AsSingle().MoveIntoAllSubContainers().NonLazy();
             
             _inputAsset.Enable();
             BindInstance(_inputAsset);

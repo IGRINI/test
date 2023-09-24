@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
+using Object = UnityEngine.Object;
 
 namespace Game.PrefabsActions
 {
@@ -13,29 +15,59 @@ namespace Game.PrefabsActions
             _container = container;
         }
         
-        public GameObject Create(Object prefab)
+        public GameObject Create(Object prefab, Action<DiContainer> contextDecorator = null)
         {
-            return _container.InstantiatePrefab(prefab);
+            var subContainer = _container;
+            if (contextDecorator != null)
+            {
+                subContainer = _container.CreateSubContainer();
+                contextDecorator?.Invoke(subContainer);
+            }
+            return subContainer.InstantiatePrefab(prefab);
         }
         
-        public GameObject Create(Object prefab, Transform parent)
+        public GameObject Create(Object prefab, Transform parent, Action<DiContainer> contextDecorator = null)
         {
-            return _container.InstantiatePrefab(prefab, parent);
+            var subContainer = _container;
+            if (contextDecorator != null)
+            {
+                subContainer = _container.CreateSubContainer();
+                contextDecorator?.Invoke(subContainer);
+            }
+            return subContainer.InstantiatePrefab(prefab, parent);
         }
 
-        public T Create<T>(Object prefab)
+        public T Create<T>(Object prefab, Action<DiContainer> contextDecorator = null)
         {
-            return _container.InstantiatePrefabForComponent<T>(prefab);
+            var subContainer = _container;
+            if (contextDecorator != null)
+            {
+                subContainer = _container.CreateSubContainer();
+                contextDecorator?.Invoke(subContainer);
+            }
+            return subContainer.InstantiatePrefabForComponent<T>(prefab);
         }
 
-        public T Create<T>(Object prefab, Transform parent)
+        public T Create<T>(Object prefab, Transform parent, Action<DiContainer> contextDecorator = null)
         {
-            return _container.InstantiatePrefabForComponent<T>(prefab, parent);
+            var subContainer = _container;
+            if (contextDecorator != null)
+            {
+                subContainer = _container.CreateSubContainer();
+                contextDecorator?.Invoke(subContainer);
+            }
+            return subContainer.InstantiatePrefabForComponent<T>(prefab, parent);
         }
 
-        public T Create<T>(Object prefab, Transform parent, IEnumerable<object> args)
+        public T Create<T>(Object prefab, Transform parent, IEnumerable<object> args, Action<DiContainer> contextDecorator = null)
         {
-            return _container.InstantiatePrefabForComponent<T>(prefab, parent, args);
+            var subContainer = _container;
+            if (contextDecorator != null)
+            {
+                subContainer = _container.CreateSubContainer();
+                contextDecorator?.Invoke(subContainer);
+            }
+            return subContainer.InstantiatePrefabForComponent<T>(prefab, parent, args);
         }
     }
 }
