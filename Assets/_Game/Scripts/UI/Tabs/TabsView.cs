@@ -44,12 +44,16 @@ public class TabsView : MonoBehaviour
 
         for (var i = 0; i < tabs.Count; i++)
         {
-            var item = _prefabCreator.Create<TabItem>(_tabPrefab, _tabsParent);
+            var item = _prefabCreator.Create<TabItem>(_tabPrefab, _tabsParent, container =>
+            {
+                container.BindInstance(tabs[i]);
+                container.BindInstance(_toggleGroup);
+                container.BindInstance(Color.white);
+                container.BindInstance(new Color(1f, 1f, 1f, .5f));
+            });
             
             if ((i + 1) < tabs.Count)
                 _separators.Add(_prefabCreator.Create(_tabSeparatorPrefab, _tabsParent));
-            
-            item.Initialize(tabs[i], _toggleGroup, Color.white, new Color(1f, 1f, 1f, .5f));
 
             _tabItems.Add(item);
         }

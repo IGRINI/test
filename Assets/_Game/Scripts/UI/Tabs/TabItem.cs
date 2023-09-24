@@ -3,6 +3,7 @@ using TMPro;
 using UniRx;
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 public class TabItem : MonoBehaviour
 {
@@ -16,7 +17,20 @@ public class TabItem : MonoBehaviour
    private Color _unselectedColor;
    private Action _onTabSelect;
    private TabsView.TabInfo _tabInfo;
-   
+
+   [Inject]
+   private void Constructor(TabsView.TabInfo tabInfo, ToggleGroup toggleGroup,
+      [Inject(Optional = true)] Color selectedColorText = default,
+      [Inject(Optional = true)] Color unselectedColorText = default)
+   {
+      _tabInfo = tabInfo;
+      _selectedColor = selectedColorText == default ? Color.white : selectedColorText;
+      _unselectedColor = unselectedColorText == default ? Color.white : unselectedColorText;
+      _tabNameText.SetText(tabInfo.TabName);
+      _tabToggle.group = toggleGroup;
+      _onTabSelect = tabInfo.OnTabSelect;
+   }
+
    private void Awake()
    {
       _tabToggle.OnValueChangedAsObservable().Subscribe(value =>
@@ -26,15 +40,5 @@ public class TabItem : MonoBehaviour
          if(value)
             _onTabSelect?.Invoke();
       });
-   }
-
-   public void Initialize(TabsView.TabInfo tabInfo, ToggleGroup toggleGroup, Color selectedColorText = default, Color unselectedColorText = default)
-   {
-      _tabInfo = tabInfo;
-      _selectedColor = selectedColorText == default ? Color.white : selectedColorText;
-      _unselectedColor = unselectedColorText == default ? Color.white : unselectedColorText;
-      _tabNameText.SetText(tabInfo.TabName);
-      _tabToggle.group = toggleGroup;
-      _onTabSelect = tabInfo.OnTabSelect;
    }
 }
