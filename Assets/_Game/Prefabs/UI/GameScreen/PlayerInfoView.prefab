@@ -687,6 +687,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7751890038483650687}
   - component: {fileID: 3658955381245864182}
+  - component: {fileID: 4734796965474102476}
   m_Layer: 5
   m_Name: PlayerInfoView
   m_TagString: Untagged
@@ -723,6 +724,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5123343175297950706}
   m_CullTransparentMesh: 1
+--- !u!114 &4734796965474102476
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5123343175297950706}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56062caebbf5f564eb776db7673a6eb9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _playerName: {fileID: 4739609850691878558}
+  _onlineMark: {fileID: 7421068543648530791}
+  _rankNumber: {fileID: 2099293356146778543}
 --- !u!1 &7421068543648530791
 GameObject:
   m_ObjectHideFlags: 0

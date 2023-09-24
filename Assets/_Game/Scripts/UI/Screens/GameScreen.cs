@@ -4,6 +4,7 @@ using Game.Utils.Common;
 using TMPro;
 using UnityEngine;
 using Zenject;
+using Random = UnityEngine.Random;
 
 namespace Game.Utils.Screens
 {
@@ -12,13 +13,13 @@ namespace Game.Utils.Screens
         [Inject] private readonly SteamService _steamService;
         
         [SerializeField] private InvitesView _invitesView;
-        [SerializeField] private TextMeshProUGUI _playerName;
+        [SerializeField] private PlayerInfoView _selfPlayerInfoView;
 
         protected override void OnInitialize(Action onComplete = null)
         {
             base.OnInitialize(onComplete);
 
-            _playerName.text = _steamService.GetUserName();
+            _selfPlayerInfoView.Initialize(_steamService.GetUserName(), Random.Range(1, 100));
         }
     }
 }
