@@ -1364,6 +1364,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8342788770869322656, guid: 797842b39c2ffe9489b0839c8a984123, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1803,17 +1807,9 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 7345845148878402472}
     m_Modifications:
-    - target: {fileID: 1570284046634785999, guid: d5f0be69c9390604e89720a48b149bf0, type: 3}
-      propertyPath: m_FillAmount
-      value: 0.187
-      objectReference: {fileID: 0}
     - target: {fileID: 3720224637410675450, guid: d5f0be69c9390604e89720a48b149bf0, type: 3}
       propertyPath: m_Name
       value: TaskItem
-      objectReference: {fileID: 0}
-    - target: {fileID: 3975605673668909045, guid: d5f0be69c9390604e89720a48b149bf0, type: 3}
-      propertyPath: 'm_ActiveFontFeatures.Array.data[0]'
-      value: 1801810542
       objectReference: {fileID: 0}
     - target: {fileID: 5606631399000672259, guid: d5f0be69c9390604e89720a48b149bf0, type: 3}
       propertyPath: m_Pivot.x
@@ -1822,10 +1818,6 @@ PrefabInstance:
     - target: {fileID: 5606631399000672259, guid: d5f0be69c9390604e89720a48b149bf0, type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 5606631399000672259, guid: d5f0be69c9390604e89720a48b149bf0, type: 3}
-      propertyPath: m_RootOrder
-      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 5606631399000672259, guid: d5f0be69c9390604e89720a48b149bf0, type: 3}
       propertyPath: m_AnchorMax.x
@@ -1898,14 +1890,6 @@ PrefabInstance:
     - target: {fileID: 5606631399000672259, guid: d5f0be69c9390604e89720a48b149bf0, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8200172347675634288, guid: d5f0be69c9390604e89720a48b149bf0, type: 3}
-      propertyPath: 'm_ActiveFontFeatures.Array.data[0]'
-      value: 1801810542
-      objectReference: {fileID: 0}
-    - target: {fileID: 9160577401375368277, guid: d5f0be69c9390604e89720a48b149bf0, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 65.8
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
