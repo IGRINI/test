@@ -7,6 +7,9 @@ using Zenject;
 
 public class TabItem : MonoBehaviour
 {
+   public const string SELECTED_COLOR = "SelectedColor";
+   public const string UNSELECTED_COLOR = "UnselectedColor";
+   
    public TabsView.TabInfo TabInfo => _tabInfo;
    public Toggle Toggle => _tabToggle;
    
@@ -20,8 +23,8 @@ public class TabItem : MonoBehaviour
 
    [Inject]
    private void Constructor(TabsView.TabInfo tabInfo, ToggleGroup toggleGroup,
-      [Inject(Optional = true)] Color selectedColorText = default,
-      [Inject(Optional = true)] Color unselectedColorText = default)
+      [Inject(Optional = true, Id = SELECTED_COLOR)] Color selectedColorText = default,
+      [Inject(Optional = true, Id = UNSELECTED_COLOR)] Color unselectedColorText = default)
    {
       _tabInfo = tabInfo;
       _selectedColor = selectedColorText == default ? Color.white : selectedColorText;

@@ -48,8 +48,8 @@ public class TabsView : MonoBehaviour
             {
                 container.BindInstance(tabs[i]);
                 container.BindInstance(_toggleGroup);
-                container.BindInstance(Color.white);
-                container.BindInstance(new Color(1f, 1f, 1f, .5f));
+                container.BindInstance(Color.white).WithId(TabItem.SELECTED_COLOR);
+                container.BindInstance(new Color(1f, 1f, 1f, .5f)).WithId(TabItem.UNSELECTED_COLOR);
             });
             
             if ((i + 1) < tabs.Count)
