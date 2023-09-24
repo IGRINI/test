@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using Game.Utils;
 using Steamworks;
+using Steamworks.Data;
 using TMPro;
 using UniRx;
 using UnityEngine;
@@ -14,73 +16,111 @@ namespace Game.Services
 {
     public class SteamService : IInitializable, ITickable, IDisposable
     {
-        public static readonly AppId_t STEAM_ID = new(480);
+        public static readonly AppId STEAM_ID = 480;
         public const string LOBBY_HOST_ID_KEY = "HostSteamID";
         
-        public static CSteamID SteamID => _mySteamId;
-        private static CSteamID _mySteamId;
+        public static SteamId SteamID => _mySteamId;
+        private static SteamId _mySteamId;
 
         private bool _initialized;
-        private static Dictionary<CSteamID, Sprite> _cacheAvatars = new();
+        private static Dictionary<SteamId, Sprite> _cacheAvatars = new();
 
-        public bool IsInLobby => _partyCreated;
-        private bool _partyCreated;
-        private bool _partyIsLoading;
-        private CSteamID _partyHostSteamID;
-        private CSteamID _partySteamId;
-        private readonly UniTaskCompletionSource<bool> _partyLoadingAwaiter = new();
+        public bool IsInLobby => _currentLobby != null;
+        private Lobby? _currentLobby;
         
         public readonly ReactiveCommand PartyClosed = new();
         public readonly ReactiveCommand PartyEntered = new();
         public readonly ReactiveCommand<int> PartyMembersUpdated = new();
-        public readonly List<CSteamID> PartyMembers = new();
+        public readonly List<Friend> PartyMembers = new();
 
         public void Initialize()
         {
             if (_initialized)
                 return;
             
-            if (!Packsize.Test()) {
-                Debug.LogError("[Steamworks.NET] Packsize Test returned false, the wrong version of Steamworks.NET is being run in this platform.");
+            try
+            {
+                Steamworks.SteamClient.Init( STEAM_ID );
             }
-
-            if (!DllCheck.Test()) {
-                Debug.LogError("[Steamworks.NET] DllCheck Test returned false, One or more of the Steamworks binaries seems to be the wrong version.");
+            catch ( System.Exception e )
+            {
+                Application.Quit();
             }
             
             try {
-                if (SteamAPI.RestartAppIfNecessary(STEAM_ID)) {
+                if (SteamClient.RestartAppIfNecessary(STEAM_ID)) {
                     Application.Quit();
                 }
             }
-            catch (DllNotFoundException e) { // We catch this exception here, as it will be the first occurrence of it.
-                Debug.LogError("[Steamworks.NET] Could not load [lib]steam_api.dll/so/dylib. It's likely not in the correct location.\n" + e);
-
+            catch (DllNotFoundException e) {
                 Application.Quit();
             }
 
-            _initialized = SteamAPI.Init();
-
             AcquireLaunchCommandLine();
             InitPartyCallbacks();
-            _mySteamId = SteamUser.GetSteamID();
-            if (_initialized) return;
-            
-            Debug.LogError("[Steamworks.NET] SteamAPI_Init() failed.");
-            Application.Quit();
+            _mySteamId = SteamClient.SteamId;
+            _initialized = true;
         }
 
         private void InitPartyCallbacks()
         {
-            Callback<LobbyCreated_t>.Create(OnLobbyCreated);
-            Callback<GameLobbyJoinRequested_t>.Create(OnGameLobbyJoinRequested);
-            Callback<LobbyEnter_t>.Create(OnLobbyEnter);
-            Callback<LobbyInvite_t>.Create(OnLobbyInvite);
-            Callback<LobbyChatUpdate_t>.Create(OnLobbyChatUpdate);
-            Callback<LobbyKicked_t>.Create(OnLobbyKicked);
+            SteamMatchmaking.OnLobbyEntered += OnLobbyEnter;
+            SteamMatchmaking.OnLobbyInvite += OnLobbyInvite;
+            SteamMatchmaking.OnLobbyMemberKicked += OnLobbyKicked;
+            SteamMatchmaking.OnLobbyMemberDisconnected += OnLobbyMemberLeave;
+            SteamMatchmaking.OnLobbyMemberLeave += OnLobbyMemberLeave;
+            SteamMatchmaking.OnLobbyMemberJoined += OnLobbyMemberJoined;
+            SteamFriends.OnGameLobbyJoinRequested += OnGameLobbyJoinRequested;
+
+            // Callback<LobbyCreated_t>.Create(OnLobbyCreated);
+            // Callback<GameLobbyJoinRequested_t>.Create(OnGameLobbyJoinRequested);
+            // Callback<LobbyEnter_t>.Create(OnLobbyEnter);
+            // Callback<LobbyInvite_t>.Create(OnLobbyInvite);
+            // Callback<LobbyChatUpdate_t>.Create(OnLobbyChatUpdate);
+            // Callback<LobbyKicked_t>.Create(OnLobbyKicked);
         }
 
-        public string GetUserName(CSteamID steamID = default)
+        private void OnLobbyMemberJoined(Lobby lobby, Friend joined)
+        {
+            try
+            {
+                if(PartyMembers.Contains(joined)) return;
+                PurgeAvatarCacheFor(joined.Id);
+                PartyMembers.Add(joined);
+                PartyMembersUpdated.Execute(PartyMembers.Count);
+                Dev.Log($"OnLobbyMemberJoined {joined.Name} {PartyMembers.Count}");
+                var MyTeamName = "Додики";
+                SteamFriends.SetRichPresence( "steam_player_group", MyTeamName );
+                SteamFriends.SetRichPresence( "steam_player_group_size", PartyMembers.Count.ToString() );
+            }
+            catch (Exception e)
+            {
+                Dev.Log(e);
+                throw;
+            }
+        }
+
+        private void OnLobbyMemberLeave(Lobby lobby, Friend leaved)
+        {
+            try
+            {
+                if(!PartyMembers.Contains(leaved)) return;
+                PurgeAvatarCacheFor(leaved.Id);
+                PartyMembers.Remove(leaved);
+                PartyMembersUpdated.Execute(PartyMembers.Count);
+                Dev.Log($"OnLobbyMemberLeave {leaved.Name} {PartyMembers.Count}");
+                var MyTeamName = "Додики";
+                SteamFriends.SetRichPresence( "steam_player_group", MyTeamName );
+                SteamFriends.SetRichPresence( "steam_player_group_size", PartyMembers.Count.ToString() );
+            }
+            catch (Exception e)
+            {
+                Dev.Log(e);
+                throw;
+            }
+        }
+
+        public string GetUserName(SteamId steamID = default)
         {
             // if (steamID == default)
             // {
@@ -88,21 +128,32 @@ namespace Game.Services
             // }
 
             // var info = SteamFriends.GetPersonaName();
-            return SteamFriends.GetPersonaName();
+            return SteamClient.Name;
         }
 
-        private void OnLobbyKicked(LobbyKicked_t param)
+        private void OnLobbyKicked(Lobby lobby, Friend kicked, Friend whoKicked)
         {
-            _partyCreated = _partyIsLoading = false;
-            _partySteamId = default;
-            PartyClosed.Execute();
-            Dev.Log($"{param.m_ulSteamIDAdmin} {param.m_ulSteamIDLobby}");
+            if (kicked.Id == SteamID)
+            {
+                _currentLobby = null;
+                PartyClosed.Execute();
+                foreach (var partyMember in PartyMembers)
+                {
+                    PurgeAvatarCacheFor(partyMember.Id);
+                }
+                PartyMembers.Clear();
+                PartyMembersUpdated.Execute(PartyMembers.Count());
+            }
+            Dev.Log($"OnLobbyKicked {whoKicked.Name} KICKED {kicked.Name} from {lobby.Id}");
+            var MyTeamName = "Додики";
+            SteamFriends.SetRichPresence( "steam_player_group", MyTeamName );
+            SteamFriends.SetRichPresence( "steam_player_group_size", PartyMembers.Count.ToString() );
         }
 
         private void AcquireLaunchCommandLine()
         {
-            if( SteamApps.GetLaunchCommandLine( out var launchCmd, 260 ) > 0 )
-                Dev.Log($"AcquireLaunchCommandLine {launchCmd}");
+            // if( SteamApps.GetLaunchParam( out var launchCmd, 260 ) > 0 )
+            //     Dev.Log($"AcquireLaunchCommandLine {launchCmd}");
         }
 
         public void Tick()
@@ -110,7 +161,7 @@ namespace Game.Services
             if (!_initialized)
                 return;
             
-            SteamAPI.RunCallbacks();
+            Steamworks.SteamClient.RunCallbacks();
         }
 
         public void Dispose()
@@ -119,24 +170,7 @@ namespace Game.Services
                 return;
             
             _initialized = false;
-            SteamAPI.Shutdown();
-        }
-
-        public Sprite GetAvatar(CSteamID steamID = default)
-        {
-            if (!_initialized)
-                return null;
-            
-            if (steamID == default)
-                steamID = _mySteamId;
-            if (_cacheAvatars.TryGetValue(steamID, out var avatar))
-                return avatar;
-            var ret = SteamFriends.GetLargeFriendAvatar(steamID);
-            var myAvatar = GetSteamImageAsTexture2D(ret);
-            var sprite = Sprite.Create(myAvatar, new Rect(0, 0, myAvatar.width, myAvatar.height), new Vector2(.5f, .5f),
-                100f);
-            _cacheAvatars.Add (steamID, sprite);
-            return sprite;
+            Steamworks.SteamClient.Shutdown();
         }
 
         public async UniTask<bool> CreateLobbyOrInvite()
@@ -144,63 +178,50 @@ namespace Game.Services
             if (!_initialized)
                 return false;
             
-            if (_partyCreated)
+            if (IsInLobby)
             {
-                SteamFriends.ActivateGameOverlayInviteDialog(_partySteamId);
+                SteamFriends.OpenGameInviteOverlay(_currentLobby.Value.Id);
                 return true;
             }
+            _currentLobby = await SteamMatchmaking.CreateLobbyAsync(3);
+            _currentLobby.Value.SetJoinable(true);
+            _currentLobby.Value.SetFriendsOnly();
+            var MyTeamName = "Додики";
+            var teamSize = 1;
 
-            if (_partyIsLoading)
-                return await _partyLoadingAwaiter.Task;
-            _partyIsLoading = true;
-            SteamMatchmaking.CreateLobby(ELobbyType.k_ELobbyTypeFriendsOnly, 3);
-            SteamFriends.ActivateGameOverlayInviteDialog(SteamID);
-            return true;
+            SteamFriends.SetRichPresence( "steam_player_group", MyTeamName );
+            SteamFriends.SetRichPresence( "steam_player_group_size", teamSize.ToString() );
+            return await CreateLobbyOrInvite();
         }
 
-        private void OnLobbyCreated(LobbyCreated_t callback)
+        private void OnGameLobbyJoinRequested(Lobby lobby, SteamId steamId)
         {
-            if (callback.m_eResult != EResult.k_EResultOK)
-            {
-                _partyLoadingAwaiter.TrySetResult(_partyCreated = _partyIsLoading = false);
-                return;
-            }
-
-            _partySteamId = new CSteamID(callback.m_ulSteamIDLobby);
-
-            SteamMatchmaking.SetLobbyData(_partySteamId, LOBBY_HOST_ID_KEY, SteamID.ToString());
-            SteamFriends.ActivateGameOverlayInviteDialog(_partySteamId);
-            _partyIsLoading = false;
-            _partyLoadingAwaiter.TrySetResult(_partyCreated = true);
+            SteamMatchmaking.JoinLobbyAsync(lobby.Id);
+            Dev.Log($"OnLobbyInvite {lobby.Id} {steamId}");
         }
 
-        private void OnGameLobbyJoinRequested(GameLobbyJoinRequested_t callback)
+        private void OnLobbyEnter(Lobby lobby)
         {
-            SteamMatchmaking.JoinLobby(callback.m_steamIDLobby);
-        }
-
-        private void OnLobbyEnter(LobbyEnter_t callback)
-        {
-            _partySteamId = new CSteamID(callback.m_ulSteamIDLobby);
-            _partyCreated = true;
-            _partyHostSteamID = new CSteamID(ulong.Parse(SteamMatchmaking.GetLobbyData(_partySteamId, LOBBY_HOST_ID_KEY)));
+            _currentLobby = lobby;
 
             PartyMembers.Clear();
-            for (var i = 0; i < SteamMatchmaking.GetNumLobbyMembers(_partySteamId); i++)
+            foreach (var lobbyMember in lobby.Members)
             {
-                var user = SteamMatchmaking.GetLobbyMemberByIndex(_partySteamId, i);
-                if(user != SteamID)
-                    PartyMembers.Add(user);
+                if(lobbyMember.Id != SteamID)
+                    PartyMembers.Add(lobbyMember);
             }
             
-            Dev.Log($"OnLobbyEnter {callback.m_rgfChatPermissions} {callback.m_EChatRoomEnterResponse} {callback.m_bLocked} {_partySteamId}");
             PartyEntered.Execute();
             PartyMembersUpdated.Execute(PartyMembers.Count);
+            var MyTeamName = "Додики";
+            SteamFriends.SetRichPresence( "steam_player_group", MyTeamName );
+            SteamFriends.SetRichPresence( "steam_player_group_size", PartyMembers.Count.ToString() );
+            Dev.Log($"OnLobbyEnter {lobby.Id} {PartyMembers.Count}");
         }
 
-        private void OnLobbyInvite(LobbyInvite_t param)
+        private void OnLobbyInvite(Friend friend, Lobby lobby)
         {
-            Dev.Log($"OnLobbyInvite {param.m_ulSteamIDLobby} {param.m_ulSteamIDUser} {param.m_ulGameID}");
+            Dev.Log($"OnLobbyInvite {friend.Name} {lobby.Id}");
         }
 
         public void LeaveLobby()
@@ -210,82 +231,78 @@ namespace Game.Services
             if(!IsInLobby)
                 return;
             
-            SteamMatchmaking.LeaveLobby(_partySteamId);
-            _partyCreated = _partyIsLoading = false;
+            _currentLobby.Value.Leave();
+
+            foreach (var partyMember in PartyMembers)
+            {
+                PurgeAvatarCacheFor(partyMember.Id);
+            }
             PartyMembers.Clear();
             PartyMembersUpdated.Execute(PartyMembers.Count);
-            Dev.Log($"LeaveLobby {_partySteamId}");
+            PartyClosed.Execute();
+            Dev.Log($"LeaveLobby {_currentLobby.Value.Id}");
+            _currentLobby = null;
+            
         }
-
-        private void OnLobbyChatUpdate(LobbyChatUpdate_t callback)
+        
+        public async UniTask<Sprite> GetAvatar(SteamId steamId = default)
         {
-            if ((EChatMemberStateChange)callback.m_rgfChatMemberStateChange == EChatMemberStateChange.k_EChatMemberStateChangeEntered)
+            try
             {
-                var id = new CSteamID(callback.m_ulSteamIDUserChanged);
-
-                if (_partyHostSteamID == id)
-                {
-                    SteamMatchmaking.LeaveLobby(_partySteamId);
-                    _partyCreated = _partyIsLoading = false;
-                    PartyClosed.Execute();
-                }
-                PartyMembers.Add(id);
-            }
-            else
-            {
-                var id = new CSteamID(callback.m_ulSteamIDUserChanged);
-                PartyMembers.Add(id);
-            }
-            if((EChatMemberStateChange)callback.m_rgfChatMemberStateChange == EChatMemberStateChange.k_EChatMemberStateChangeLeft)
-            {
-                PartyMembers.Remove(new CSteamID(callback.m_ulSteamIDUserChanged));
-            }
-            PartyMembersUpdated.Execute(PartyMembers.Count);
-
-            Dev.Log($"OnChatJoined {PartyMembers.Count} {callback.m_rgfChatMemberStateChange} {callback.m_ulSteamIDLobby} {callback.m_ulSteamIDMakingChange} {callback.m_ulSteamIDUserChanged}");
+                if (!_initialized)
+                    return null;
             
+                if (steamId == default)
+                    steamId = _mySteamId;
+                if (_cacheAvatars.TryGetValue(steamId, out var avatar))
+                {
+                    return avatar;
+                }
+                var ret = await SteamFriends.GetLargeAvatarAsync(steamId);
+                if (ret != null)
+                {
+                    var myAvatar = GetSteamImageAsTexture2D(ret.Value);
+                    var sprite = Sprite.Create(myAvatar, new Rect(0, 0, myAvatar.width, myAvatar.height), new Vector2(.5f, .5f),
+                        100f);
+                    _cacheAvatars.Add(steamId, sprite);
+                    return sprite;
+                }
+
+                return null;
+            }
+            catch ( Exception e )
+            {
+                Dev.Log( e );
+                return null;
+            }
         }
 
-        private static Texture2D GetSteamImageAsTexture2D(int iImage) {
-
-            Texture2D FlipTexture(Texture2D original)
+        private void PurgeAvatarCacheFor(SteamId steamId)
+        {
+            if (_cacheAvatars.TryGetValue(steamId, out var avatar))
             {
-                var flipped = new Texture2D(original.width, original.height);
-     
-                var xN = original.width;
-                var yN = original.height;
-     
-                for(var i=0;i<xN;i++)
-                {
-                    for(var j=0;j<yN;j++)
-                    {
-                        flipped.SetPixel(i, yN-j-1, original.GetPixel(i,j));
-                    }
-                }
-
-                flipped.Apply();
-     
-                return flipped;
+                Object.DestroyImmediate(avatar.texture);
+                Object.DestroyImmediate(avatar);
+                _cacheAvatars.Remove(steamId);
             }
-            
-            Texture2D ret = null;
-            uint ImageWidth;
-            uint ImageHeight;
-            var bIsValid = SteamUtils.GetImageSize(iImage, out ImageWidth, out ImageHeight);
+        }
 
-            if (!bIsValid) return ret;
-            var Image = new byte[ImageWidth * ImageHeight * 4];
+        private static Texture2D GetSteamImageAsTexture2D(Image image) {
+            var avatar = new Texture2D( (int)image.Width, (int)image.Height, TextureFormat.ARGB32, false );
+	
+            avatar.filterMode = FilterMode.Trilinear;
 
-            bIsValid = SteamUtils.GetImageRGBA(iImage, Image, (int)(ImageWidth * ImageHeight * 4));
-            if (!bIsValid) return ret;
-            ret = new Texture2D((int)ImageWidth, (int)ImageHeight, TextureFormat.RGBA32, false, true);
-            ret.LoadRawTextureData(Image);
-            ret.Apply();
-            
-            var result = FlipTexture(ret);
-            Object.DestroyImmediate (ret);
-            
-            return result;
+            for ( int x = 0; x < image.Width; x++ )
+            {
+                for ( int y = 0; y < image.Height; y++ )
+                {
+                    var p = image.GetPixel( x, y );
+                    avatar.SetPixel( x, (int)image.Height - y, new UnityEngine.Color( p.r / 255.0f, p.g / 255.0f, p.b / 255.0f, p.a / 255.0f ) );
+                }
+            }
+	
+            avatar.Apply();
+            return avatar;
         }
     }
 }

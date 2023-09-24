@@ -22,12 +22,6 @@ namespace Game.Utils.Common
 
         public void SetButtonInfo(Sprite sprite = null)
         {
-            if (_avatarImage.sprite != _defaultSprite)
-            {
-                var cache = _avatarImage.sprite;
-                DestroyImmediate(cache.texture);
-                DestroyImmediate(cache);
-            }
             if(sprite == null)
             {
                 _plusIcon.enabled = true;

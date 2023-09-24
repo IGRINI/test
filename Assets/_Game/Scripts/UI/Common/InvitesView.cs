@@ -1,4 +1,5 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using System;
+using Cysharp.Threading.Tasks;
 using Game.Services;
 using TMPro;
 using UniRx;
@@ -20,9 +21,9 @@ namespace Game.Utils.Common
 
         private Texture2D _mySmallAvatar;
 
-        private void Start()
+        private async void Start()
         {
-            var avatar = _steamService.GetAvatar();
+            var avatar = await _steamService.GetAvatar();
             _myButton.SetButtonInfo(avatar);
             
             _myButton.OnClick.AddListener(CreateLobby);
@@ -48,7 +49,7 @@ namespace Game.Utils.Common
             _steamService.PartyMembersUpdated.Subscribe(UpdateIcons);
         }
 
-        private void UpdateIcons(int playersCount)
+        private async void UpdateIcons(int playersCount)
         {
             switch (playersCount)
             {
@@ -57,12 +58,12 @@ namespace Game.Utils.Common
                     _secondFriend.SetButtonInfo();
                     break;
                 case 1:
-                    _firstFriend.SetButtonInfo(_steamService.GetAvatar(_steamService.PartyMembers[0]));
+                    _firstFriend.SetButtonInfo(await _steamService.GetAvatar(_steamService.PartyMembers[0].Id));
                     _secondFriend.SetButtonInfo();
                     break;
                 case 2:
-                    _firstFriend.SetButtonInfo(_steamService.GetAvatar(_steamService.PartyMembers[0]));
-                    _secondFriend.SetButtonInfo(_steamService.GetAvatar(_steamService.PartyMembers[1]));
+                    _firstFriend.SetButtonInfo(await _steamService.GetAvatar(_steamService.PartyMembers[0].Id));
+                    _secondFriend.SetButtonInfo(await _steamService.GetAvatar(_steamService.PartyMembers[1].Id));
                     break;
             }
         }
