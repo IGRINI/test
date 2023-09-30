@@ -14,12 +14,9 @@ namespace Game.Installers
     public class ProjectInstaller : MonoInstaller
     {
         [SerializeField] private InputActionAsset _inputAsset;
-        [SerializeField] private TextMeshProUGUI _consoleText;
         
         public override void InstallBindings()
         {
-            SignalsInstaller.Install(Container);
-            
             Container.BindInterfacesAndSelfTo<ClientController>().AsSingle().MoveIntoAllSubContainers().NonLazy();
             Container.BindInterfacesAndSelfTo<PrefabCreator>().AsSingle().MoveIntoAllSubContainers().NonLazy();
             

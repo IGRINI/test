@@ -15,12 +15,9 @@ namespace Game.Controllers
         private readonly InputAction _mousePosition;
         private readonly InputAction _mouseDelta;
         
-        private readonly SignalBus _signalBus;
-        
-        public MouseController(InputActionAsset inputAsset, SignalBus signalBus)
+        public MouseController(InputActionAsset inputAsset)
         {
             _inputAsset = inputAsset;
-            _signalBus = signalBus;
             
             _mouseMap = _inputAsset.FindActionMap("Mouse");
             _mousePosition = _mouseMap.FindAction("Position");

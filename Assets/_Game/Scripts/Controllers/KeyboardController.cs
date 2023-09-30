@@ -32,7 +32,7 @@ namespace Game.Controllers
         public event Action<KeyAction> KeyCanceled;
         public event Action<Vector2> Move;
 
-        public KeyboardController(InputActionAsset inputAsset, SignalBus signalBus)
+        public KeyboardController(InputActionAsset inputAsset)
         {
             _inputAsset = inputAsset;
             

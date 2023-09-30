@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using Game.Utils;
 using Steamworks;
 using Steamworks.Data;
-using TMPro;
 using UniRx;
 using UnityEngine;
 using Zenject;
@@ -16,8 +14,7 @@ namespace Game.Services
 {
     public class SteamService : IInitializable, ITickable, IDisposable
     {
-        public static readonly AppId STEAM_ID = 480;
-        public const string LOBBY_HOST_ID_KEY = "HostSteamID";
+        public static readonly AppId STEAM_ID = 2629130;
         
         public static SteamId SteamID => _mySteamId;
         private static SteamId _mySteamId;

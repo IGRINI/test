@@ -10,7 +10,6 @@ namespace Game.Network
 {
     public class ClientController : IInitializable, IDisposable, IRakClient
     {
-        private readonly SignalBus _signalBus;
         
         private CancellationTokenSource _loopToken;
 
@@ -21,11 +20,6 @@ namespace Game.Network
         private bool _loopThreadActive;
 
         public string NickName { get; private set; }
-
-        private ClientController(SignalBus signalBus)
-        {
-            _signalBus = signalBus;
-        }
         
         public void Initialize()
         {
