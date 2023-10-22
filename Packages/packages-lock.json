@@ -7,11 +7,11 @@
       "dependencies": {}
     },
     "com.unity.addressables": {
-      "version": "1.21.17",
+      "version": "1.21.18",
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.unity.scriptablebuildpipeline": "1.21.9",
+        "com.unity.scriptablebuildpipeline": "1.21.20",
         "com.unity.modules.assetbundle": "1.0.0",
         "com.unity.modules.imageconversion": "1.0.0",
         "com.unity.modules.jsonserialize": "1.0.0",
@@ -44,7 +44,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.ide.rider": {
-      "version": "3.0.24",
+      "version": "3.0.26",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -101,7 +101,7 @@
       }
     },
     "com.unity.scriptablebuildpipeline": {
-      "version": "1.21.9",
+      "version": "1.21.20",
       "depth": 1,
       "source": "registry",
       "dependencies": {},
@@ -124,7 +124,7 @@
       }
     },
     "com.unity.timeline": {
-      "version": "1.8.5",
+      "version": "1.8.6",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -142,6 +142,15 @@
       "dependencies": {
         "com.unity.modules.ui": "1.0.0",
         "com.unity.modules.imgui": "1.0.0"
+      }
+    },
+    "com.unity.visualeffectgraph": {
+      "version": "16.0.3",
+      "depth": 0,
+      "source": "builtin",
+      "dependencies": {
+        "com.unity.shadergraph": "16.0.3",
+        "com.unity.render-pipelines.core": "16.0.3"
       }
     },
     "com.unity.modules.ai": {

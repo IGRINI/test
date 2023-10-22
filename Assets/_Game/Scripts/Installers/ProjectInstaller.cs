@@ -26,7 +26,7 @@ namespace Game.Installers
             BindSingle<MouseController>();
             BindSingle<KeyboardController>();
 
-            BindSingle<SteamService>();
+            Container.BindInterfacesAndSelfTo<SteamService>().AsSingle().MoveIntoAllSubContainers().NonLazy();
         }
 
         private IfNotBoundBinder BindSingle<T>()

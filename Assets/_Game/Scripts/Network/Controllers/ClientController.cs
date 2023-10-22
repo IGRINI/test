@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Text;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Game.Common;
+using Game.Services;
 using ModestTree;
+using Steamworks;
+using Steamworks.Data;
 using UnityEngine;
 using Zenject;
 
@@ -10,10 +14,13 @@ namespace Game.Network
 {
     public class ClientController : IInitializable, IDisposable, IRakClient
     {
+        public int Ping => RakClient.Ping;
         
         private CancellationTokenSource _loopToken;
 
-        public event Action<ConnectInfo> OnConnectedInfo;
+        private readonly ConnectInfo ConnectionInfo = new();
+
+        public event Action<ConnectInfo> ConnectionUpdate;
         public event Action<NetworkPackets.Packet> OnPacketReceived;
         
         private Thread _loopThread;
@@ -23,7 +30,7 @@ namespace Game.Network
         
         public void Initialize()
         {
-            OnPacketReceived += x =>
+            OnPacketReceived += async x =>
                 {
                     switch (x)
                     {
@@ -36,7 +43,9 @@ namespace Game.Network
                             {
                                 bsOut.Write((byte)GamePacketID.CLIENT_DATA_REPLY);
                                 bsOut.Write(NickName);
-                                RakClient.Send(bsOut, PacketPriority.IMMEDIATE_PRIORITY, PacketReliability.RELIABLE, 0);
+                                var ticket = await SteamService.GetAuthTicket();
+                                bsOut.Write(BitConverter.ToString(ticket.Data).Replace("-", string.Empty));
+                                RakClient.Send(bsOut, PacketPriority.IMMEDIATE_PRIORITY, PacketReliability.RELIABLE);
                             }
                             break;
                     }
@@ -113,34 +122,28 @@ namespace Game.Network
 
         public void OnConnecting(string address, ushort port, string password)
         {
-            OnConnectedInfo?.Invoke(new ConnectInfo()
-            {
-                Address = address,
-                Port = port,
-                Password = password,
-                State = ClientState.IS_CONNECTING
-            });
+            ConnectionInfo.Address = address;
+            ConnectionInfo.Port = port;
+            ConnectionInfo.Password = password;
+            ConnectionInfo.State = ClientState.IS_CONNECTING;
+            ConnectionUpdate?.Invoke(ConnectionInfo);
         }
 
         public void OnConnected(string address, ushort port, string password)
         {
-            OnConnectedInfo?.Invoke(new ConnectInfo()
-            {
-                Address = address,
-                Port = port,
-                Password = password,
-                State = ClientState.IS_CONNECTED
-            });
+            ConnectionInfo.Address = address;
+            ConnectionInfo.Port = port;
+            ConnectionInfo.Password = password;
+            ConnectionInfo.State = ClientState.IS_CONNECTED;
+            ConnectionUpdate?.Invoke(ConnectionInfo);
         }
 
         public void OnDisconnected(DisconnectReason reason, string message = "")
         {
-            OnConnectedInfo?.Invoke(new ConnectInfo()
-            {
-                State = ClientState.IS_DISCONNECTED,
-                DisconnectMessage = message,
-                DisconnectReason = reason
-            });
+            ConnectionInfo.DisconnectMessage = message;
+            ConnectionInfo.DisconnectReason = reason;
+            ConnectionInfo.State = ClientState.IS_DISCONNECTED;
+            ConnectionUpdate?.Invoke(ConnectionInfo);
         }
 
         public void OnReceived(GamePacketID packet_id, uint packet_size, BitStream bitStream, ulong local_time)

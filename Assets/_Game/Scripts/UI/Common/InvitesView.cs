@@ -26,7 +26,6 @@ namespace Game.Utils.Common
             var avatar = await _steamService.GetAvatar();
             _myButton.SetButtonInfo(avatar);
             
-            _myButton.OnClick.AddListener(CreateLobby);
             _firstFriend.OnClick.AddListener(CreateLobby);
             _secondFriend.OnClick.AddListener(CreateLobby);
             _lobbyButton.OnClick.AddListener(LobbyButtonCallback);

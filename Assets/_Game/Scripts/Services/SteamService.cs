@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using Game.Network;
 using Game.Utils;
 using Steamworks;
 using Steamworks.Data;
@@ -14,13 +15,16 @@ namespace Game.Services
 {
     public class SteamService : IInitializable, ITickable, IDisposable
     {
+        private readonly ClientController _clientController;
+        
         public static readonly AppId STEAM_ID = 2629130;
         
-        public static SteamId SteamID => _mySteamId;
-        private static SteamId _mySteamId;
+        public static SteamId SteamID { get; private set; }
 
+        private static AuthTicket _authTicket;
+        
         private bool _initialized;
-        private static Dictionary<SteamId, Sprite> _cacheAvatars = new();
+        private static readonly Dictionary<SteamId, Sprite> _cacheAvatars = new();
 
         public bool IsInLobby => _currentLobby != null;
         private Lobby? _currentLobby;
@@ -30,6 +34,11 @@ namespace Game.Services
         public readonly ReactiveCommand<int> PartyMembersUpdated = new();
         public readonly List<Friend> PartyMembers = new();
 
+        private SteamService(ClientController clientController)
+        {
+            _clientController = clientController;
+        }
+
         public void Initialize()
         {
             if (_initialized)
@@ -37,9 +46,9 @@ namespace Game.Services
             
             try
             {
-                Steamworks.SteamClient.Init( STEAM_ID );
+                SteamClient.Init( STEAM_ID );
             }
-            catch ( System.Exception e )
+            catch ( Exception e )
             {
                 Application.Quit();
             }
@@ -55,8 +64,9 @@ namespace Game.Services
 
             AcquireLaunchCommandLine();
             InitPartyCallbacks();
-            _mySteamId = SteamClient.SteamId;
+            SteamID = SteamClient.SteamId;
             _initialized = true;
+            _clientController.SetNickName(SteamClient.Name);
         }
 
         private void InitPartyCallbacks()
@@ -128,6 +138,15 @@ namespace Game.Services
             return SteamClient.Name;
         }
 
+        public static async UniTask<AuthTicket> GetAuthTicket()
+        {
+            if(_authTicket != default)
+                return _authTicket;
+            _authTicket = await SteamUser.GetAuthTicketForWebApiAsync("MainGrimServer");
+            Debug.Log(SteamClient.SteamId);
+            return _authTicket;
+        }
+
         private void OnLobbyKicked(Lobby lobby, Friend kicked, Friend whoKicked)
         {
             if (kicked.Id == SteamID)
@@ -158,7 +177,7 @@ namespace Game.Services
             if (!_initialized)
                 return;
             
-            Steamworks.SteamClient.RunCallbacks();
+            SteamClient.RunCallbacks();
         }
 
         public void Dispose()
@@ -167,7 +186,8 @@ namespace Game.Services
                 return;
             
             _initialized = false;
-            Steamworks.SteamClient.Shutdown();
+            SteamClient.Shutdown();
+            _authTicket.Dispose();
         }
 
         public async UniTask<bool> CreateLobbyOrInvite()
@@ -250,7 +270,7 @@ namespace Game.Services
                     return null;
             
                 if (steamId == default)
-                    steamId = _mySteamId;
+                    steamId = SteamID;
                 if (_cacheAvatars.TryGetValue(steamId, out var avatar))
                 {
                     return avatar;

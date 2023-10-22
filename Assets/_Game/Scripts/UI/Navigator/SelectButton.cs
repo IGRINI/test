@@ -1,10 +1,11 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using Game.Utils;
 using TMPro;
 using UnityEngine;
 
-namespace Game.Utils
+namespace Game.UI.Navigator
 {
     public class SelectButton : UIButton
     {
@@ -19,12 +20,12 @@ namespace Game.Utils
         public async void MakeSelected()
         {
             await UniTask.NextFrame();
-            _selectButtonSettings.ButtonText.DOColor(_selectButtonSettings.SelectedColor, _selectButtonSettings.Duration);
+            DOTweenModuleUI.DOColor(_selectButtonSettings.ButtonText, _selectButtonSettings.SelectedColor, _selectButtonSettings.Duration);
         }
 
         public void MakeDeselected()
         {
-            _selectButtonSettings.ButtonText.DOColor(_selectButtonSettings.DeselectedColor, _selectButtonSettings.Duration);
+            DOTweenModuleUI.DOColor(_selectButtonSettings.ButtonText, _selectButtonSettings.DeselectedColor, _selectButtonSettings.Duration);
         }
 
         [Serializable]
